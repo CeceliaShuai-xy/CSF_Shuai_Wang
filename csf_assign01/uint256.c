@@ -8,18 +8,25 @@
 // Only the least-significant 64 bits are initialized directly,
 // all other bits are set to 0.
 UInt256 uint256_create_from_u64(uint64_t val) {
-  UInt256 result;
-  // TODO: implement
-  return result;
+  UInt256 *result = malloc(sizeof(UInt256));
+  result->data[0] = val;
+  printf("check : %u", result->data[0]);
+  for(int i = 1; i < 4; i++) {
+    result->data[i] = 0;
+  }
+  return *result;
 }
 
 // Create a UInt256 value from an array of 4 uint64_t values.
 // The element at index 0 is the least significant, and the element
 // at index 3 is the most significant.
 UInt256 uint256_create(const uint64_t data[4]) {
-  UInt256 result;
-  // TODO: implement
-  return result;
+  UInt256 *result = malloc(sizeof(UInt256));
+  for(int i = 0; i < 4; i++) {
+    result->data[i] = data[i];
+  }
+
+  return *result;
 }
 
 // Create a UInt256 value from a string of hexadecimal digits.
@@ -41,8 +48,7 @@ char *uint256_format_as_hex(UInt256 val) {
 // Index 0 is the least significant 64 bits, index 3 is the most
 // significant 64 bits.
 uint64_t uint256_get_bits(UInt256 val, unsigned index) {
-  uint64_t bits;
-  // TODO: implement
+  uint64_t bits = val.data[index];
   return bits;
 }
 
