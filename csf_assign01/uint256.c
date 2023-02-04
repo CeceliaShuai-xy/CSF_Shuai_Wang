@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h> // check!
+// #include <math.h> // check!
 #include "uint256.h"
 
 // Create a UInt256 value from a single uint64_t value.
@@ -10,7 +12,6 @@
 UInt256 uint256_create_from_u64(uint64_t val) {
   UInt256 *result = malloc(sizeof(UInt256));
   result->data[0] = val;
-  printf("check : %u", result->data[0]);
   for(int i = 1; i < 4; i++) {
     result->data[i] = 0;
   }
@@ -29,10 +30,43 @@ UInt256 uint256_create(const uint64_t data[4]) {
   return *result;
 }
 
+// Helper function to convert a uint64_t to array of binary char
+char *uint64_to_binary(uint64_t val) {
+  char *binary = malloc(sizeof(char) * 64);
+  int count = 0;
+  for (int i = 63; i >= 0; i--) {
+    char c = val & ((uint64_t)1 << i) ? '1' : '0';
+    *(binary + count) = c;
+    count++;
+  }
+  return binary;
+}
+
 // Create a UInt256 value from a string of hexadecimal digits.
+// Gigi
 UInt256 uint256_create_from_hex(const char *hex) {
   UInt256 result;
-  // TODO: implement
+  if (strlen(hex) <= 16) {
+    result = uint256_create_from_u64(strtoul(hex, NULL, 16));
+    return result;
+  }
+  char copy[strlen(hex)];
+  strcpy(copy, hex);
+  char *endptr = copy + strlen(copy);
+  result = uint256_create_from_u64(strtoul(endptr - 16, NULL, 16));
+  endptr -= 16;
+  *endptr = '\0';
+  for (int i = 1; i < 4; i++) {
+    char * holder = endptr - 16;
+    if (copy < holder) {
+      result.data[i] = strtoul(holder, NULL, 16);
+      endptr = holder;
+      *endptr = '\0';
+    } else {
+      result.data[i] = strtoul(copy, NULL, 16);
+      break;
+    }
+  }
   return result;
 }
 
@@ -52,11 +86,53 @@ uint64_t uint256_get_bits(UInt256 val, unsigned index) {
   return bits;
 }
 
+// helper function that add two uint64 int and stores it into UInt256 in the index
+// return whether this operator has carried over
+int uint64_add(uint64_t left, uint64_t right, int hasCarriedOver, UInt256* sum, int index) {
+  char* left_binary = uint64_to_binary(left);
+  char* right_binary = uint64_to_binary(right);
+  char* sum_binary = malloc(sizeof(char) * 65);
+  //initialized the sum string
+  sum_binary[64] = '\0';
+  for(int i = 0; i < 64; i++) {
+    sum_binary[i] = '0';
+  }
+  int carry = hasCarriedOver;
+  for (int i = 63; i >=0; i--) {
+    if (left_binary[i] == '0' && right_binary[i] == '0') {
+      if (carry == 1) {
+        sum_binary[i] = '1';
+        carry = 0;
+      }
+    } else if (left_binary[i] == '1' && right_binary[i] == '1') {
+        if (carry == 0) {
+          carry = 1;
+        }
+        else {
+          sum_binary[i] = '1';
+        }
+    } else {
+        if (carry == 0) {
+          sum_binary[i] = '1';
+        }
+      }
+  }
+  sum->data[index] = strtoul(sum_binary, NULL, 2);
+  free(left_binary);
+  free(right_binary);
+  free(sum_binary);
+  return carry;
+}
+
 // Compute the sum of two UInt256 values.
+// Gigi
 UInt256 uint256_add(UInt256 left, UInt256 right) {
-  UInt256 sum;
-  // TODO: implement
-  return sum;
+  UInt256 *sum = malloc(sizeof(UInt256));
+  int hasCarried = 0;
+  for(int i = 0; i < 4; i++) {
+    hasCarried = uint64_add(left.data[i], right.data[i], hasCarried, sum, i);
+  }
+  return *sum;
 }
 
 // Compute the difference of two UInt256 values.
@@ -72,3 +148,14 @@ UInt256 uint256_mul(UInt256 left, UInt256 right) {
   // TODO: implement
   return product;
 }
+
+// // for testing purpose
+// int main(void) {
+//   uint64_t val = 5;
+//   char * test = uint64_to_binary(val);
+//   printf("\n \n outside:");
+//   for(int i = 0; i < 64; i++) {
+//     printf("%c", *(test+i));
+//   }
+//   return 0;
+// }
