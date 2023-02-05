@@ -42,19 +42,31 @@ char *uint64_to_binary(uint64_t val) {
   return binary;
 }
 
-// Helper function to convert a uint64_t to its two's complement, and sign should indicate positive or negative
-char *uint64_to_twos_complement(uint64_t val, int sign) {
+// Helper function to negate uint64_t 
+uint64_t reverse_digit_uint64_t(uint64_t val) {
   char *binary = malloc(sizeof(char) * 64);
-  binary = uint64_to_binary(val);
-  
   int count = 0;
   for (int i = 63; i >= 0; i--) {
     char c = val & ((uint64_t)1 << i) ? '0' : '1';
     *(binary + count) = c;
     count++;
   }
-  binary = uint64_add(binary, uint64_to_binary((uint64_t) 1),1,NULL,0);
-  return binary;
+  uint64_t *reversed_val = malloc(sizeof(uint64_t));
+  char *endptr = binary + strlen(binary);
+  *endptr = '\0';
+  *reversed_val = strtoul(binary, NULL, 2);
+  free(binary);
+  return *reversed_val;
+}
+
+// Helper function to create two's complement of a UInt256 value
+UInt256 *UInt256_to_twos_complement(UInt256 value) {
+  for (int i = 0; i < 4; i++) {
+    value.data[i] = reverse_digit_uint64_t(value.data[i]);
+  }
+  UInt256 *negation = malloc(sizeof(UInt256));
+  *negation = uint256_add(uint256_create_from_u64(1U), value);
+  return negation;
 }
 
 // Create a UInt256 value from a string of hexadecimal digits.
@@ -167,10 +179,7 @@ UInt256 uint256_add(UInt256 left, UInt256 right) {
 // Cecelia
 UInt256 uint256_sub(UInt256 left, UInt256 right) {
   UInt256 *result = malloc(sizeof(UInt256));
-  int hasCarried = 0;
-  for (int i = 0; i < 4; i ++) {
-    hasCarried = uint64_add(uint64_to_binary(left.data[i]), uint64_to_twos_complement(right.data[i],0), hasCarried, result, i);
-  }
+  *result = uint256_add(left, *UInt256_to_twos_complement(right));
   return *result;
 }
 
