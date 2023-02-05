@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
   TEST(test_create_from_u64);
   TEST(test_create);
   TEST(test_create_from_hex);
-  // TEST(test_format_as_hex);
+  TEST(test_format_as_hex);
   TEST(test_add_1);
   TEST(test_add_2);
   TEST(test_add_3);

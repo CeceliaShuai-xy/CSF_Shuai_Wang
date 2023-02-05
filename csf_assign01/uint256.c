@@ -42,6 +42,21 @@ char *uint64_to_binary(uint64_t val) {
   return binary;
 }
 
+// Helper function to convert a uint64_t to its two's complement, and sign should indicate positive or negative
+char *uint64_to_twos_complement(uint64_t val, int sign) {
+  char *binary = malloc(sizeof(char) * 64);
+  binary = uint64_to_binary(val);
+  
+  int count = 0;
+  for (int i = 63; i >= 0; i--) {
+    char c = val & ((uint64_t)1 << i) ? '0' : '1';
+    *(binary + count) = c;
+    count++;
+  }
+  binary = uint64_add(binary, uint64_to_binary((uint64_t) 1),1,NULL,0);
+  return binary;
+}
+
 // Create a UInt256 value from a string of hexadecimal digits.
 // Gigi
 UInt256 uint256_create_from_hex(const char *hex) {
@@ -72,9 +87,24 @@ UInt256 uint256_create_from_hex(const char *hex) {
 
 // Return a dynamically-allocated string of hex digits representing the
 // given UInt256 value.
+// Cecelia
 char *uint256_format_as_hex(UInt256 val) {
-  char *hex = NULL;
-  // TODO: implement
+  char *hex = (char*)malloc(sizeof(char)* 64 + 1);
+  char *buff = (char*)malloc(sizeof(char)* (16 + 1));
+  
+  int counter = 0;
+  for (int i = 3; i >= 0; i--) {
+    uint64_t data = val.data[i];
+    sprintf(buff, "%lx", data);
+    for (int j = 0; j<strlen(buff); j++) {
+      hex[counter++] = buff[j];
+    }
+  }
+
+  while(hex[0]=='0' & strlen(hex) > 1) {
+    hex += 1;
+  }
+  free(buff);
   return hex;
 }
 
@@ -88,9 +118,7 @@ uint64_t uint256_get_bits(UInt256 val, unsigned index) {
 
 // helper function that add two uint64 int and stores it into UInt256 in the index
 // return whether this operator has carried over
-int uint64_add(uint64_t left, uint64_t right, int hasCarriedOver, UInt256* sum, int index) {
-  char* left_binary = uint64_to_binary(left);
-  char* right_binary = uint64_to_binary(right);
+int uint64_add(char* left_binary, char* right_binary, int hasCarriedOver, UInt256* sum, int index) {
   char* sum_binary = malloc(sizeof(char) * 65);
   //initialized the sum string
   sum_binary[64] = '\0';
@@ -130,16 +158,20 @@ UInt256 uint256_add(UInt256 left, UInt256 right) {
   UInt256 *sum = malloc(sizeof(UInt256));
   int hasCarried = 0;
   for(int i = 0; i < 4; i++) {
-    hasCarried = uint64_add(left.data[i], right.data[i], hasCarried, sum, i);
+    hasCarried = uint64_add(uint64_to_binary(left.data[i]), uint64_to_binary(right.data[i]), hasCarried, sum, i);
   }
   return *sum;
 }
 
 // Compute the difference of two UInt256 values.
+// Cecelia
 UInt256 uint256_sub(UInt256 left, UInt256 right) {
-  UInt256 result;
-  // TODO: implement
-  return result;
+  UInt256 *result = malloc(sizeof(UInt256));
+  int hasCarried = 0;
+  for (int i = 0; i < 4; i ++) {
+    hasCarried = uint64_add(uint64_to_binary(left.data[i]), uint64_to_twos_complement(right.data[i],0), hasCarried, result, i);
+  }
+  return *result;
 }
 
 // Compute the product of two UInt256 values.
