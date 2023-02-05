@@ -148,6 +148,7 @@ void test_create_from_hex(TestObjs *objs) {
 
   //TODO: Added Tests 
   val = uint256_create_from_hex(objs->hex3);
+  // objs->hex3 = "4a4b72ebb654226ef77ed83d884f494   0e4243bc3913ceaf   5781b28d25fb00b0";
   ASSERT(check(val, 0x4a4b72ebb654226UL, 0xef77ed83d884f494UL, 0x0e4243bc3913ceafUL, 0x5781b28d25fb00b0UL));
 }
 

@@ -89,23 +89,40 @@ UInt256 uint256_create_from_hex(const char *hex) {
 // given UInt256 value.
 // Cecelia
 char *uint256_format_as_hex(UInt256 val) {
-  char *hex = (char*)malloc(sizeof(char)* 64 + 1);
-  char *buff = (char*)malloc(sizeof(char)* (16 + 1));
+  char *hex = (char*)malloc(sizeof(char)* 64);
+  char *buff = (char*)malloc(sizeof(char)* (16));
   
   int counter = 0;
   for (int i = 3; i >= 0; i--) {
     uint64_t data = val.data[i];
-    sprintf(buff, "%lx", data);
-    for (int j = 0; j<strlen(buff); j++) {
+    sprintf(buff, "%016lx", data);
+    for (int j = 0; j<16; j++) {
       hex[counter++] = buff[j];
     }
   }
-
-  while(hex[0]=='0' & strlen(hex) > 1) {
-    hex += 1;
+  int count_digits = 0;
+  int i = 0;
+  while(hex[i]=='0') {
+    count_digits++;
+    i++;
   }
+  int hex_length = 64 - count_digits;
+  char* return_hex;
+  if (hex_length <= 0) {
+    return_hex = malloc(sizeof(char) * 2);
+    return_hex[0] = '0';
+    return_hex[1] = '\0';
+  } else {
+    return_hex = malloc(hex_length + 1);
+    return_hex[hex_length] = '\0';
+    for (int i = 0; i < hex_length; i++) {
+      return_hex[i] = hex[count_digits + i];
+    }
+  }
+
   free(buff);
-  return hex;
+  free(hex);
+  return return_hex;
 }
 
 // Get 64 bits of data from a UInt256 value.
