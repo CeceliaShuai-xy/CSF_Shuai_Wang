@@ -2,8 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h> // check!
-// #include <math.h> // check!
+#include <string.h> 
 #include "uint256.h"
 
 // Create a UInt256 value from a single uint64_t value.
@@ -30,7 +29,7 @@ UInt256 uint256_create(const uint64_t data[4]) {
   return result;
 }
 
-// Helper function to convert a uint64_t to array of binary char
+// Helper function to convert a uint64_t to array of binary char for easier shifting
 char *uint64_to_binary(uint64_t val) {
   char *binary = malloc(sizeof(char) * 64);
   int count = 0;
@@ -41,24 +40,7 @@ char *uint64_to_binary(uint64_t val) {
   }
   return binary;
 }
-/*
-// Helper function to negate uint64_t 
-uint64_t reverse_digit_uint64_t(uint64_t val) {
-  char *binary = malloc(sizeof(char) * 64);
-  int count = 0;
-  for (int i = 63; i >= 0; i--) {
-    char c = val & ((uint64_t)1 << i) ? '0' : '1';
-    *(binary + count) = c;
-    count++;
-  }
-  uint64_t *reversed_val = malloc(sizeof(uint64_t));
-  char *endptr = binary + strlen(binary);
-  *endptr = '\0';
-  *reversed_val = strtoul(binary, NULL, 2);
-  free(binary);
-  return *reversed_val;
-}
-*/
+
 
 // Helper function to create two's complement of a UInt256 value
 UInt256 UInt256_to_twos_complement(UInt256 value) {
@@ -254,32 +236,7 @@ int uint256_bit_is_set(UInt256 val, unsigned index) {
 
 // Left shit UInt 256 value by a specified number
 UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
-  /*
-  if (shift == 0) {
-    return val;
-  }
-  for (int i = 3; i >= 0; i--) {
-    uint64_t value = val.data[i];
-    // very new array out of four will be composed of two parts, left and right (at most come from two arrays)
-    uint64_t left_bits;
-    uint64_t right_bits;
-    int index = shift/64;
-    if (index == 0) {
-      right_bits = val.data[i-1]>>((unsigned int)64-shift);
-      left_bits = value<<shift;;
-      val.data[i] = left_bits + right_bits;
-    } else {
-      // the bits come from  data[3-index] and data[2-index]
-      right_bits = val.data[index]>>((unsigned int)64-shift);
-      (index * 64 + shift)
-    }
-    
-  }
-  */
-
-  //handle the data[0] case
-  //val.data[0] = val.data[0]<<shift;
-  char old_binary[256] = {'5'};
+  char old_binary[256];
   int counter = 0;
   
   for (int i = 3; i >= 0; i--) {
@@ -309,14 +266,3 @@ UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
   return val;
 }
 
-
-// // for testing purpose
-// int main(void) {
-//   uint64_t val = 5;
-//   char * test = uint64_to_binary(val);
-//   printf("\n \n outside:");
-//   for(int i = 0; i < 64; i++) {
-//     printf("%c", *(test+i));
-//   }
-//   return 0;
-// }

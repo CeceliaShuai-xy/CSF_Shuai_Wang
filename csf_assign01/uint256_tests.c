@@ -509,7 +509,7 @@ void test_0_mul_0(TestObjs *objs) {
 }
 
 void test_add_overflow_by_1(TestObjs *objs){
-
+  (void) *objs;
   UInt256 max;
   for (int i = 0; i < 4; ++i) {
     max.data[i] = ~(0UL); 
@@ -527,7 +527,7 @@ void test_add_overflow_by_1(TestObjs *objs){
 }
 
 void test_add_overflow_by_more(TestObjs *objs){
-
+  (void) *objs;
   UInt256 max, num;
   for (int i = 0; i < 4; ++i) {
     max.data[i] = ~(0UL); 
@@ -550,7 +550,7 @@ void test_add_overflow_by_more(TestObjs *objs){
 }
 
 void test_sub_overflow_by_1(TestObjs *objs){
-
+  (void) *objs;
   UInt256 result, max;
   for (int i = 0; i < 4; ++i) {
     max.data[i] = ~(0UL); 
@@ -564,8 +564,8 @@ void test_sub_overflow_by_1(TestObjs *objs){
 }
 
 void test_sub_overflow_by_more(TestObjs *objs){
-
-  UInt256 result, max, num, num_minus_one;
+  (void) *objs;
+  UInt256 result, max, num;
   for (int i = 0; i < 4; ++i) {
     max.data[i] = ~(0UL); 
   }
@@ -585,6 +585,7 @@ void test_sub_overflow_by_more(TestObjs *objs){
 }
 
 void test_bit_is_set(TestObjs *objs) {
+  (void) *objs;
   UInt256 num;
   num.data[0] = 0UL;
   num.data[1] = 1UL;
@@ -603,7 +604,7 @@ void test_bit_is_set(TestObjs *objs) {
 
 void test_left_shift_simple(TestObjs *objs) {
   // test a simple case
-
+  (void) *objs;
   UInt256 val;
   val.data[0] = 1UL;
   val.data[1] = 0UL;
@@ -619,7 +620,7 @@ void test_left_shift_simple(TestObjs *objs) {
 
 void test_left_shift_complex(TestObjs *objs) {
   // test a simple case
-
+  (void) *objs;
   UInt256 val;
   val.data[0] = 3UL;
   val.data[1] = 1UL;
