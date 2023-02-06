@@ -55,7 +55,8 @@ void test_sub_overflow_by_1(TestObjs *objs);
 void test_sub_overflow_by_more(TestObjs *objs);
 
 void test_bit_is_set(TestObjs *objs);
-void test_left_shift(TestObjs *objs);
+void test_left_shift_simple(TestObjs *objs);
+void test_left_shift_complex(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -69,34 +70,38 @@ int main(int argc, char **argv) {
   TEST(test_create);
   TEST(test_create_from_hex);
   TEST(test_format_as_hex);
-  // TEST(test_add_1);
-  // TEST(test_add_2);
-  // TEST(test_add_3);test_format_as_hex
-  // TEST(test_sub_1);
-  // TEST(test_sub_2);
-  // TEST(test_sub_3);
-  // TEST(test_mul_1);
-  // TEST(test_mul_2);
+  TEST(test_add_1);
+  TEST(test_add_2);
+  TEST(test_add_3);
+  TEST(test_sub_1);
+  TEST(test_sub_2);
+  TEST(test_sub_3);
+  TEST(test_mul_1);
+  TEST(test_mul_2);
 
-  // //add more tests
-  // TEST(test_large_add_0);
-  // TEST(test_medium_add_0);
-  // TEST(test_0_add_0);
+  //add more tests
+  TEST(test_large_add_0);
+  TEST(test_medium_add_0);
+  TEST(test_0_add_0);
 
-  // TEST(test_large_sub_0);
-  // TEST(test_medium_sub_0);
-  // TEST(test_0_sub_0);
+  TEST(test_large_sub_0);
+  TEST(test_medium_sub_0);
+  TEST(test_0_sub_0);
 
-  // TEST(test_0_mul_0);
-  // TEST(test_medium_mul_0);
+  TEST(test_0_mul_0);
+  TEST(test_medium_mul_0);
 
-  // TEST(test_add_overflow_by_1);
-  // TEST(test_add_overflow_by_more);
-  // TEST(test_sub_overflow_by_1);
-  // TEST(test_sub_overflow_by_more);  
+  TEST(test_add_overflow_by_1);
+  TEST(test_add_overflow_by_more);
+  TEST(test_sub_overflow_by_1);
+  TEST(test_sub_overflow_by_more);  
 
-  // TEST(test_bit_is_set);
-  // TEST(test_left_shift);
+
+
+  TEST(test_bit_is_set);
+  TEST(test_left_shift_simple);
+  TEST(test_left_shift_complex);
+
   
   
   TEST_FINI();
@@ -596,8 +601,37 @@ void test_bit_is_set(TestObjs *objs) {
 
 }
 
+void test_left_shift_simple(TestObjs *objs) {
+  // test a simple case
 
-void test_left_shift(TestObjs *objs) {
+  UInt256 val;
+  val.data[0] = 1UL;
+  val.data[1] = 0UL;
+  val.data[2] = 0UL;
+  val.data[3] = 0UL;
+  UInt256 shifted = uint256_leftshift(val,1);
+  ASSERT(shifted.data[0] == 2UL);
+  ASSERT(shifted.data[1] == 0UL);
+  ASSERT(shifted.data[2] == 0UL);
+  ASSERT(shifted.data[3] == 0UL);
+}
 
 
+void test_left_shift_complex(TestObjs *objs) {
+  // test a simple case
+
+  UInt256 val;
+  val.data[0] = 3UL;
+  val.data[1] = 1UL;
+  val.data[2] = 0UL;
+  val.data[3] = ~(0UL);
+  // so the data looks like
+  // [0..011][0...1][0..0][1...1] = 1...1|0...0|0...1|0...11
+  // let's say shift = 5
+  // should be (11111 shifted out of scope) 1..00000|0..0|0...100000|0..1100000
+  UInt256 shifted = uint256_leftshift(val,5);
+  ASSERT(shifted.data[0] == 3UL<<5);
+  ASSERT(shifted.data[1] == 1UL<<5);
+  ASSERT(shifted.data[2] == 0UL);
+  ASSERT(shifted.data[3] == ~(0UL) << 5);
 }

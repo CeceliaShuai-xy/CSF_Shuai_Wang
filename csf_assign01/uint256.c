@@ -41,7 +41,7 @@ char *uint64_to_binary(uint64_t val) {
   }
   return binary;
 }
-
+/*
 // Helper function to negate uint64_t 
 uint64_t reverse_digit_uint64_t(uint64_t val) {
   char *binary = malloc(sizeof(char) * 64);
@@ -58,11 +58,12 @@ uint64_t reverse_digit_uint64_t(uint64_t val) {
   free(binary);
   return *reversed_val;
 }
+*/
 
 // Helper function to create two's complement of a UInt256 value
 UInt256 UInt256_to_twos_complement(UInt256 value) {
   for (int i = 0; i < 4; i++) {
-    value.data[i] = reverse_digit_uint64_t(value.data[i]);
+    value.data[i] = ~(value.data[i]);
   }
   UInt256 negation  = uint256_add(uint256_create_from_u64(1U), value);
   return negation;
@@ -147,7 +148,7 @@ uint64_t uint256_get_bits(UInt256 val, unsigned index) {
 // helper function that add two uint64 int and stores it into UInt256 in the index
 // return whether this operator has carried over
 int uint64_add(char* left_binary, char* right_binary, int hasCarriedOver, UInt256* sum, int index) {
-  char* sum_binary = malloc(sizeof(char) * 65);
+  char sum_binary[65];
   //initialized the sum string
   sum_binary[64] = '\0';
   for(int i = 0; i < 64; i++) {
@@ -176,7 +177,7 @@ int uint64_add(char* left_binary, char* right_binary, int hasCarriedOver, UInt25
   sum->data[index] = strtoul(sum_binary, NULL, 2);
   free(left_binary);
   free(right_binary);
-  free(sum_binary);
+  //free(sum_binary);
   return carry;
 }
 
@@ -197,13 +198,14 @@ UInt256 uint256_add(UInt256 left, UInt256 right) {
     uint64_t individual_left = uint256_get_bits(left, i);
     uint64_t individual_right = uint256_get_bits(right, i);
 
-    uint64_t individual_sum = individual_left + individual_right;
-    if ((individual_sum >= individual_left) && (individual_sum >= individual_right)) {
+    uint64_t individual_sum = individual_left + individual_right + hasCarriedOver;
+    if (individual_sum < individual_left || individual_sum < individual_right) {
       hasCarriedOver = 0U;
     } else {
       hasCarriedOver = 1U;
     }
     sum.data[i] = individual_sum;
+
   }
   return sum;
 }
@@ -211,15 +213,19 @@ UInt256 uint256_add(UInt256 left, UInt256 right) {
 // Compute the difference of two UInt256 values.
 // Cecelia
 UInt256 uint256_sub(UInt256 left, UInt256 right) {
-  UInt256 *result = malloc(sizeof(UInt256));
-  *result = uint256_add(left, UInt256_to_twos_complement(right));
-  return *result;
+  UInt256 result = uint256_add(left, UInt256_to_twos_complement(right));
+  return result;
 }
 
 // Compute the product of two UInt256 values.
 UInt256 uint256_mul(UInt256 left, UInt256 right) {
-  UInt256 product;
-  // TODO: implement
+  UInt256 product = uint256_create_from_u64(0UL);
+  for (int i = 0; i < 256; i++) {
+    if (uint256_bit_is_set(right,i) == 1) {
+      product = uint256_add(product, uint256_leftshift(left,i));
+    }
+  }
+  // if no 1 bit in right (times 0), return 0
   return product;
 }
 
@@ -245,6 +251,65 @@ int uint256_bit_is_set(UInt256 val, unsigned index) {
   } 
   return 0;
 }
+
+// Left shit UInt 256 value by a specified number
+UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
+  /*
+  if (shift == 0) {
+    return val;
+  }
+  for (int i = 3; i >= 0; i--) {
+    uint64_t value = val.data[i];
+    // very new array out of four will be composed of two parts, left and right (at most come from two arrays)
+    uint64_t left_bits;
+    uint64_t right_bits;
+    int index = shift/64;
+    if (index == 0) {
+      right_bits = val.data[i-1]>>((unsigned int)64-shift);
+      left_bits = value<<shift;;
+      val.data[i] = left_bits + right_bits;
+    } else {
+      // the bits come from  data[3-index] and data[2-index]
+      right_bits = val.data[index]>>((unsigned int)64-shift);
+      (index * 64 + shift)
+    }
+    
+  }
+  */
+
+  //handle the data[0] case
+  //val.data[0] = val.data[0]<<shift;
+  char old_binary[256] = {'5'};
+  int counter = 0;
+  
+  for (int i = 3; i >= 0; i--) {
+    char* ptr = uint64_to_binary(val.data[i]);
+    for (int j = 0; j < 64; j++) {
+      old_binary[counter++] = ptr[j];
+    }
+    free(ptr);
+  }
+
+  char new_binary[256+1];
+  for(int i = 0; i < 256; i++) {
+    new_binary[i] = '0';
+  }
+  new_binary[256] = '\0';
+  counter = 0;
+  for (int i = shift; i < 256; i++) {
+    new_binary[counter++] = old_binary[i];
+  }
+
+  counter = 0;
+  for (int i = 256-64; i >= 0; i=i-64) {
+    val.data[counter++] = strtoul(&new_binary[i], NULL, 2);
+    new_binary[i] = '\0';
+  }
+
+  return val;
+}
+
+
 // // for testing purpose
 // int main(void) {
 //   uint64_t val = 5;
