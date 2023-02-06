@@ -50,9 +50,9 @@ void test_medium_mul_0(TestObjs *objs);
 void test_0_mul_0(TestObjs *objs);
 //Overflow
 void test_add_overflow_by_1(TestObjs *objs);
-void test_add_overflow_partial(TestObjs *objs);
-void test_sub_overflow(TestObjs *objs);
-
+void test_add_overflow_by_more(TestObjs *objs);
+void test_sub_overflow_by_1(TestObjs *objs);
+void test_sub_overflow_by_more(TestObjs *objs);
 
 
 int main(int argc, char **argv) {
@@ -89,8 +89,9 @@ int main(int argc, char **argv) {
   TEST(test_medium_mul_0);
 
   TEST(test_add_overflow_by_1);
-  TEST(test_add_overflow_partial);
-  TEST(test_sub_overflow);
+  TEST(test_add_overflow_by_more);
+  TEST(test_sub_overflow_by_1);
+  TEST(test_sub_overflow_by_more);  
 
 
   TEST_FINI();
@@ -515,20 +516,21 @@ void test_add_overflow_by_1(TestObjs *objs){
   ASSERT(sum.data[0] == 0UL);
 }
 
-void test_add_overflow_partial(TestObjs *objs){
+void test_add_overflow_by_more(TestObjs *objs){
   (void) objs;
-  UInt256 max, one;
+  UInt256 max, num;
   for (int i = 0; i < 4; ++i) {
     max.data[i] = ~(0UL); 
   }
 
-  one.data[0] = 0UL;
-  one.data[1] = 1UL;
-  one.data[2] = 0UL;
-  one.data[3] = 0UL;
 
-  // overflow occurs from data[1] to data[3] (become all 0s), but data[0] preserves
-  UInt256 sum = uint256_add(max, one);
+  num.data[0] = 0UL;
+  num.data[1] = 1UL;
+  num.data[2] = 0UL;
+  num.data[3] = 0UL;
+
+  // parts that overflowed becomes 0
+  UInt256 sum = uint256_add(max, num);
 
   // these assertions should succeed
   ASSERT(sum.data[3] == 0UL);
@@ -537,6 +539,37 @@ void test_add_overflow_partial(TestObjs *objs){
   ASSERT(sum.data[0] == max.data[0]);
 }
 
-void test_sub_overflow(TestObjs *objs){
+void test_sub_overflow_by_1(TestObjs *objs){
+  (void) objs;
+  UInt256 result, max;
+  for (int i = 0; i < 4; ++i) {
+    max.data[i] = ~(0UL); 
+  }
+  // 0-1 = max (overflow)
+  result = uint256_sub(objs->zero,objs->one);
+  ASSERT(result.data[3] == max.data[3]);
+  ASSERT(result.data[2] == max.data[2]);
+  ASSERT(result.data[1] == max.data[1]);
+  ASSERT(result.data[0] == max.data[0]);
+}
 
+void test_sub_overflow_by_more(TestObjs *objs){
+  (void) objs;
+  UInt256 result, max, num, num_minus_one;
+  for (int i = 0; i < 4; ++i) {
+    max.data[i] = ~(0UL); 
+  }
+  
+  // 0-num => only the part that could be represented are shown
+
+  num.data[0] = 0UL;
+  num.data[1] = 1UL;
+  num.data[2] = 0UL;
+  num.data[3] = 0UL;
+
+  result = uint256_sub(objs->zero,num);
+  ASSERT(result.data[3] == max.data[3]);
+  ASSERT(result.data[2] == max.data[2]);
+  ASSERT(result.data[1] == max.data[1]);
+  ASSERT(result.data[0] == 0UL);
 }
