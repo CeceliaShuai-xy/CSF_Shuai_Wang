@@ -207,6 +207,28 @@ UInt256 uint256_mul(UInt256 left, UInt256 right) {
   return product;
 }
 
+// Check whether a particular bit at index is set to 1 in a UInt256 data, return true(1) or false(0)
+int uint256_bit_is_set(UInt256 val, unsigned index) {
+  int array_index;
+  if (index >= 192) {
+    array_index = 3;
+  } 
+  else if (index >= 128) {
+    array_index = 2;
+  } 
+  else if (index >= 64) {
+    array_index = 1;
+  } 
+  else {
+    array_index = 0;
+  }
+
+  uint64_t value = val.data[array_index];
+  if ((value << (index - 64*array_index)) & (uint64_t)1) {
+    return 1;
+  } 
+  return 0;
+}
 // // for testing purpose
 // int main(void) {
 //   uint64_t val = 5;
