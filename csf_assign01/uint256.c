@@ -41,7 +41,7 @@ char *uint64_to_binary(uint64_t val) {
   }
   return binary;
 }
-
+/*
 // Helper function to negate uint64_t 
 uint64_t reverse_digit_uint64_t(uint64_t val) {
   char *binary = malloc(sizeof(char) * 64);
@@ -58,11 +58,12 @@ uint64_t reverse_digit_uint64_t(uint64_t val) {
   free(binary);
   return *reversed_val;
 }
+*/
 
 // Helper function to create two's complement of a UInt256 value
 UInt256 UInt256_to_twos_complement(UInt256 value) {
   for (int i = 0; i < 4; i++) {
-    value.data[i] = reverse_digit_uint64_t(value.data[i]);
+    value.data[i] = ~(value.data[i]);
   }
   UInt256 negation  = uint256_add(uint256_create_from_u64(1U), value);
   return negation;
@@ -239,19 +240,58 @@ int uint256_bit_is_set(UInt256 val, unsigned index) {
 
 // Left shit UInt 256 value by a specified number
 UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
+  /*
   if (shift == 0) {
     return val;
   }
-  // assume 1 <= shift <=64
-  for (int i = 3; i >= 1; i--) {
+  for (int i = 3; i >= 0; i--) {
     uint64_t value = val.data[i];
-    uint64_t old_bits = value<<shift;
-    //bits that come from the next data[i-1]
-    uint64_t new_bits = val.data[i-1]>>((unsigned int)64-shift);
-    val.data[i] = old_bits + new_bits;
+    // very new array out of four will be composed of two parts, left and right (at most come from two arrays)
+    uint64_t left_bits;
+    uint64_t right_bits;
+    int index = shift/64;
+    if (index == 0) {
+      right_bits = val.data[i-1]>>((unsigned int)64-shift);
+      left_bits = value<<shift;;
+      val.data[i] = left_bits + right_bits;
+    } else {
+      // the bits come from  data[3-index] and data[2-index]
+      right_bits = val.data[index]>>((unsigned int)64-shift);
+      (index * 64 + shift)
+    }
+    
   }
+  */
+
   //handle the data[0] case
-  val.data[0] = val.data[0]<<shift;
+  //val.data[0] = val.data[0]<<shift;
+  char old_binary[256] = {'5'};
+  int counter = 0;
+  
+  for (int i = 3; i >= 0; i--) {
+    char* ptr = uint64_to_binary(val.data[i]);
+    for (int j = 0; j < 64; j++) {
+      old_binary[counter++] = ptr[j];
+    }
+    free(ptr);
+  }
+
+  char new_binary[256+1];
+  for(int i = 0; i < 256; i++) {
+    new_binary[i] = '0';
+  }
+  new_binary[256] = '\0';
+  counter = 0;
+  for (int i = shift; i < 256; i++) {
+    new_binary[counter++] = old_binary[i];
+  }
+
+  counter = 0;
+  for (int i = 256-64; i >= 0; i=i-64) {
+    val.data[counter++] = strtoul(&new_binary[i], NULL, 2);
+    new_binary[i] = '\0';
+  }
+
   return val;
 }
 

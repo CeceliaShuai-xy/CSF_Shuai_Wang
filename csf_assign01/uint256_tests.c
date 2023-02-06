@@ -55,7 +55,8 @@ void test_sub_overflow_by_1(TestObjs *objs);
 void test_sub_overflow_by_more(TestObjs *objs);
 
 void test_bit_is_set(TestObjs *objs);
-void test_left_shift(TestObjs *objs);
+void test_left_shift_simple(TestObjs *objs);
+void test_left_shift_complex(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -96,7 +97,8 @@ int main(int argc, char **argv) {
   TEST(test_sub_overflow_by_more);  
 
   TEST(test_bit_is_set);
-  TEST(test_left_shift);
+  TEST(test_left_shift_simple);
+  TEST(test_left_shift_complex);
   
   
   TEST_FINI();
@@ -596,8 +598,23 @@ void test_bit_is_set(TestObjs *objs) {
 
 }
 
+void test_left_shift_simple(TestObjs *objs) {
+  // test a simple case
 
-void test_left_shift(TestObjs *objs) {
+  UInt256 val;
+  val.data[0] = 1UL;
+  val.data[1] = 0UL;
+  val.data[2] = 0UL;
+  val.data[3] = 0UL;
+  UInt256 shifted = uint256_leftshift(val,1);
+  ASSERT(shifted.data[0] == 2UL);
+  ASSERT(shifted.data[1] == 0UL);
+  ASSERT(shifted.data[2] == 0UL);
+  ASSERT(shifted.data[3] == 0UL);
+}
+
+
+void test_left_shift_complex(TestObjs *objs) {
   // test a simple case
 
   UInt256 val;
