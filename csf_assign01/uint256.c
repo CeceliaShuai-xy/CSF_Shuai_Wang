@@ -100,20 +100,20 @@ UInt256 uint256_create_from_hex(const char *hex) {
 // given UInt256 value.
 // Cecelia
 char *uint256_format_as_hex(UInt256 val) {
-  char *hex = (char*)malloc(sizeof(char)* 64);
-  char *buff = (char*)malloc(sizeof(char)* (16));
+  char hex_holder[64];
+  char *buff = (char*)malloc(sizeof(char)* (16) + 1);
   
   int counter = 0;
   for (int i = 3; i >= 0; i--) {
     uint64_t data = val.data[i];
     sprintf(buff, "%016lx", data);
     for (int j = 0; j<16; j++) {
-      hex[counter++] = buff[j];
+      hex_holder[counter++] = buff[j];
     }
   }
   int count_digits = 0;
   int i = 0;
-  while(hex[i]=='0') {
+  while(hex_holder[i]=='0') {
     count_digits++;
     i++;
   }
@@ -127,14 +127,14 @@ char *uint256_format_as_hex(UInt256 val) {
     return_hex = malloc(hex_length + 1);
     return_hex[hex_length] = '\0';
     for (int i = 0; i < hex_length; i++) {
-      return_hex[i] = hex[count_digits + i];
+      return_hex[i] = hex_holder[count_digits + i];
     }
   }
 
   free(buff);
-  free(hex);
   return return_hex;
 }
+
 
 // Get 64 bits of data from a UInt256 value.
 // Index 0 is the least significant 64 bits, index 3 is the most
@@ -183,12 +183,29 @@ int uint64_add(char* left_binary, char* right_binary, int hasCarriedOver, UInt25
 // Compute the sum of two UInt256 values.
 // Gigi
 UInt256 uint256_add(UInt256 left, UInt256 right) {
-  UInt256 *sum = malloc(sizeof(UInt256));
-  int hasCarried = 0;
-  for(int i = 0; i < 4; i++) {
-    hasCarried = uint64_add(uint64_to_binary(left.data[i]), uint64_to_binary(right.data[i]), hasCarried, sum, i);
+  // UInt256 *sum = malloc(sizeof(UInt256));
+  // int hasCarried = 0;
+  // for(int i = 0; i < 4; i++) {
+  //   hasCarried = uint64_add(uint64_to_binary(left.data[i]), uint64_to_binary(right.data[i]), hasCarried, sum, i);
+  // }
+  // return *sum;
+
+  uint64_t hasCarriedOver = 0;
+
+  UInt256 sum = uint256_create_from_u64(0U);
+  for (int i = 0; i < 4; i++) {
+    uint64_t individual_left = uint256_get_bits(left, i);
+    uint64_t individual_right = uint256_get_bits(right, i);
+
+    uint64_t individual_sum = individual_left + individual_right;
+    if ((individual_sum >= individual_left) && (individual_sum >= individual_right)) {
+      hasCarriedOver = 0U;
+    } else {
+      hasCarriedOver = 1U;
+    }
+    sum.data[i] = individual_sum;
   }
-  return *sum;
+  return sum;
 }
 
 // Compute the difference of two UInt256 values.

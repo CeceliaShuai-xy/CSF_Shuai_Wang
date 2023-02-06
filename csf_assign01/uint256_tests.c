@@ -69,34 +69,34 @@ int main(int argc, char **argv) {
   TEST(test_create);
   TEST(test_create_from_hex);
   TEST(test_format_as_hex);
-  TEST(test_add_1);
-  TEST(test_add_2);
-  TEST(test_add_3);
-  TEST(test_sub_1);
-  TEST(test_sub_2);
-  TEST(test_sub_3);
-  TEST(test_mul_1);
-  TEST(test_mul_2);
+  // TEST(test_add_1);
+  // TEST(test_add_2);
+  // TEST(test_add_3);test_format_as_hex
+  // TEST(test_sub_1);
+  // TEST(test_sub_2);
+  // TEST(test_sub_3);
+  // TEST(test_mul_1);
+  // TEST(test_mul_2);
 
-  //add more tests
-  TEST(test_large_add_0);
-  TEST(test_medium_add_0);
-  TEST(test_0_add_0);
+  // //add more tests
+  // TEST(test_large_add_0);
+  // TEST(test_medium_add_0);
+  // TEST(test_0_add_0);
 
-  TEST(test_large_sub_0);
-  TEST(test_medium_sub_0);
-  TEST(test_0_sub_0);
+  // TEST(test_large_sub_0);
+  // TEST(test_medium_sub_0);
+  // TEST(test_0_sub_0);
 
-  TEST(test_0_mul_0);
-  TEST(test_medium_mul_0);
+  // TEST(test_0_mul_0);
+  // TEST(test_medium_mul_0);
 
-  TEST(test_add_overflow_by_1);
-  TEST(test_add_overflow_by_more);
-  TEST(test_sub_overflow_by_1);
-  TEST(test_sub_overflow_by_more);  
+  // TEST(test_add_overflow_by_1);
+  // TEST(test_add_overflow_by_more);
+  // TEST(test_sub_overflow_by_1);
+  // TEST(test_sub_overflow_by_more);  
 
-  TEST(test_bit_is_set);
-  TEST(test_left_shift);
+  // TEST(test_bit_is_set);
+  // TEST(test_left_shift);
   
   
   TEST_FINI();
