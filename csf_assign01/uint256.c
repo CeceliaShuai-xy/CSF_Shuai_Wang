@@ -127,41 +127,6 @@ uint64_t uint256_get_bits(UInt256 val, unsigned index) {
   return bits;
 }
 
-// helper function that add two uint64 int and stores it into UInt256 in the index
-// return whether this operator has carried over
-int uint64_add(char* left_binary, char* right_binary, int hasCarriedOver, UInt256* sum, int index) {
-  char sum_binary[65];
-  //initialized the sum string
-  sum_binary[64] = '\0';
-  for(int i = 0; i < 64; i++) {
-    sum_binary[i] = '0';
-  }
-  int carry = hasCarriedOver;
-  for (int i = 63; i >=0; i--) {
-    if (left_binary[i] == '0' && right_binary[i] == '0') {
-      if (carry == 1) {
-        sum_binary[i] = '1';
-        carry = 0;
-      }
-    } else if (left_binary[i] == '1' && right_binary[i] == '1') {
-        if (carry == 0) {
-          carry = 1;
-        }
-        else {
-          sum_binary[i] = '1';
-        }
-    } else {
-        if (carry == 0) {
-          sum_binary[i] = '1';
-        }
-      }
-  }
-  sum->data[index] = strtoul(sum_binary, NULL, 2);
-  free(left_binary);
-  free(right_binary);
-  //free(sum_binary);
-  return carry;
-}
 
 // Compute the sum of two UInt256 values.
 // Gigi
