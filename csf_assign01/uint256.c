@@ -201,8 +201,13 @@ UInt256 uint256_sub(UInt256 left, UInt256 right) {
 
 // Compute the product of two UInt256 values.
 UInt256 uint256_mul(UInt256 left, UInt256 right) {
-  UInt256 product;
-  // TODO: implement
+  UInt256 product = uint256_create_from_u64(0UL);
+  for (int i = 0; i < 256; i++) {
+    if (uint256_bit_is_set(right,i) == 1) {
+      product = uint256_add(product, uint256_leftshift(left,i));
+    }
+  }
+  // if no 1 bit in right (times 0), return 0
   return product;
 }
 
@@ -231,7 +236,10 @@ int uint256_bit_is_set(UInt256 val, unsigned index) {
 
 // Left shit UInt 256 value by a specified number
 UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
-  // assume 0 <= shift <=64
+  if (shift == 0) {
+    return val;
+  }
+  // assume 1 <= shift <=64
   for (int i = 3; i >= 1; i--) {
     uint64_t value = val.data[i];
     uint64_t old_bits = value<<shift;
