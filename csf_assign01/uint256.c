@@ -199,8 +199,52 @@ int uint256_bit_is_set(UInt256 val, unsigned index) {
   return 0;
 }
 
+//Helper function for within 64-bits shift
+UInt256 uint256_leftshift_piecewise(UInt256 val, unsigned shift) {
+  if (shift == 0) {
+    return val;
+  }
+  // assume 0 < shift <=64
+  for (int i = 3; i >= 1; i--) {
+    uint64_t value = val.data[i];
+    uint64_t old_bits = value<<shift;
+    //bits that come from the next data[i-1]
+    uint64_t new_bits = val.data[i-1]>>((unsigned int)64-shift);
+    val.data[i] = old_bits + new_bits;
+  }
+  //handle the data[0] case
+  val.data[0] = val.data[0]<<shift;
+  return val;
+}
+
 // Left shit UInt 256 value by a specified number
 UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
+  if (shift == 0) {
+    return val;
+  }
+
+  if (shift < 64) {
+    return uint256_leftshift_piecewise(val, shift);
+  } else {
+    UInt256 new_val = uint256_create_from_u64(0UL);
+    int times = shift/64;
+    if (times >= 4) {
+      return new_val;
+    } else {
+      int counter = 0;
+      int modular = shift%64;
+      for (int i = times; i < 4; i++) {
+        new_val.data[i] = val.data[counter++];
+      }
+      return uint256_leftshift_piecewise(new_val, modular);
+    }
+  }
+
+  return val;
+}
+
+
+ /*
   char old_binary[256];
   int counter = 0;
   
@@ -227,7 +271,4 @@ UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
     val.data[counter++] = strtoul(&new_binary[i], NULL, 2);
     new_binary[i] = '\0';
   }
-
-  return val;
-}
-
+  */
