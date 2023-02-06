@@ -598,6 +598,20 @@ void test_bit_is_set(TestObjs *objs) {
 
 
 void test_left_shift(TestObjs *objs) {
+  // test a simple case
 
-
+  UInt256 val;
+  val.data[0] = 3UL;
+  val.data[1] = 1UL;
+  val.data[2] = 0UL;
+  val.data[3] = ~(0UL);
+  // so the data looks like
+  // [0..011][0...1][0..0][1...1] = 1...1|0...0|0...1|0...11
+  // let's say shift = 5
+  // should be (11111 shifted out of scope) 1..00000|0..0|0...100000|0..1100000
+  UInt256 shifted = uint256_leftshift(val,5);
+  ASSERT(shifted.data[0] == 3UL<<5);
+  ASSERT(shifted.data[1] == 1UL<<5);
+  ASSERT(shifted.data[2] == 0UL);
+  ASSERT(shifted.data[3] == ~(0UL) << 5);
 }

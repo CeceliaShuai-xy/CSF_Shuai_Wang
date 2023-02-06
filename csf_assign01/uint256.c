@@ -228,6 +228,23 @@ int uint256_bit_is_set(UInt256 val, unsigned index) {
   } 
   return 0;
 }
+
+// Left shit UInt 256 value by a specified number
+UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
+  // assume 0 <= shift <=64
+  for (int i = 3; i >= 1; i--) {
+    uint64_t value = val.data[i];
+    uint64_t old_bits = value<<shift;
+    //bits that come from the next data[i-1]
+    uint64_t new_bits = val.data[i-1]>>((unsigned int)64-shift);
+    val.data[i] = old_bits + new_bits;
+  }
+  //handle the data[0] case
+  val.data[0] = val.data[0]<<shift;
+  return val;
+}
+
+
 // // for testing purpose
 // int main(void) {
 //   uint64_t val = 5;
