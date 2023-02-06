@@ -147,7 +147,7 @@ uint64_t uint256_get_bits(UInt256 val, unsigned index) {
 // helper function that add two uint64 int and stores it into UInt256 in the index
 // return whether this operator has carried over
 int uint64_add(char* left_binary, char* right_binary, int hasCarriedOver, UInt256* sum, int index) {
-  char* sum_binary = malloc(sizeof(char) * 65);
+  char sum_binary[65];
   //initialized the sum string
   sum_binary[64] = '\0';
   for(int i = 0; i < 64; i++) {
@@ -176,7 +176,7 @@ int uint64_add(char* left_binary, char* right_binary, int hasCarriedOver, UInt25
   sum->data[index] = strtoul(sum_binary, NULL, 2);
   free(left_binary);
   free(right_binary);
-  free(sum_binary);
+  //free(sum_binary);
   return carry;
 }
 
@@ -185,8 +185,12 @@ int uint64_add(char* left_binary, char* right_binary, int hasCarriedOver, UInt25
 UInt256 uint256_add(UInt256 left, UInt256 right) {
   UInt256 *sum = malloc(sizeof(UInt256));
   int hasCarried = 0;
+  uint64_t left_binary;
+  uint64_t right_binary;
   for(int i = 0; i < 4; i++) {
-    hasCarried = uint64_add(uint64_to_binary(left.data[i]), uint64_to_binary(right.data[i]), hasCarried, sum, i);
+    left_binary = uint64_to_binary(left.data[i]);
+    right_binary = uint64_to_binary(right.data[i]);
+    hasCarried = uint64_add(left_binary, right_binary, hasCarried, sum, i);
   }
   return *sum;
 }
@@ -194,9 +198,8 @@ UInt256 uint256_add(UInt256 left, UInt256 right) {
 // Compute the difference of two UInt256 values.
 // Cecelia
 UInt256 uint256_sub(UInt256 left, UInt256 right) {
-  UInt256 *result = malloc(sizeof(UInt256));
-  *result = uint256_add(left, UInt256_to_twos_complement(right));
-  return *result;
+  UInt256 result = uint256_add(left, UInt256_to_twos_complement(right));
+  return result;
 }
 
 // Compute the product of two UInt256 values.
