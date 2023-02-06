@@ -54,6 +54,8 @@ void test_add_overflow_by_more(TestObjs *objs);
 void test_sub_overflow_by_1(TestObjs *objs);
 void test_sub_overflow_by_more(TestObjs *objs);
 
+void test_bit_is_set(TestObjs *objs);
+void test_left_shift(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -93,7 +95,10 @@ int main(int argc, char **argv) {
   TEST(test_sub_overflow_by_1);
   TEST(test_sub_overflow_by_more);  
 
-
+  TEST(test_bit_is_set);
+  TEST(test_left_shift);
+  
+  
   TEST_FINI();
 }
 
@@ -499,7 +504,7 @@ void test_0_mul_0(TestObjs *objs) {
 }
 
 void test_add_overflow_by_1(TestObjs *objs){
-  (void) objs;
+
   UInt256 max;
   for (int i = 0; i < 4; ++i) {
     max.data[i] = ~(0UL); 
@@ -517,7 +522,7 @@ void test_add_overflow_by_1(TestObjs *objs){
 }
 
 void test_add_overflow_by_more(TestObjs *objs){
-  (void) objs;
+
   UInt256 max, num;
   for (int i = 0; i < 4; ++i) {
     max.data[i] = ~(0UL); 
@@ -540,7 +545,7 @@ void test_add_overflow_by_more(TestObjs *objs){
 }
 
 void test_sub_overflow_by_1(TestObjs *objs){
-  (void) objs;
+
   UInt256 result, max;
   for (int i = 0; i < 4; ++i) {
     max.data[i] = ~(0UL); 
@@ -554,7 +559,7 @@ void test_sub_overflow_by_1(TestObjs *objs){
 }
 
 void test_sub_overflow_by_more(TestObjs *objs){
-  (void) objs;
+
   UInt256 result, max, num, num_minus_one;
   for (int i = 0; i < 4; ++i) {
     max.data[i] = ~(0UL); 
@@ -572,4 +577,27 @@ void test_sub_overflow_by_more(TestObjs *objs){
   ASSERT(result.data[2] == max.data[2]);
   ASSERT(result.data[1] == max.data[1]);
   ASSERT(result.data[0] == 0UL);
+}
+
+void test_bit_is_set(TestObjs *objs) {
+  UInt256 num;
+  num.data[0] = 0UL;
+  num.data[1] = 1UL;
+  num.data[2] = 2UL;
+  num.data[3] = 3UL;
+  // [0,...0][1,0,...,0][0,1,0,...0][1,1,0,...,0]
+  // index that has 1 is: 64, 129, 192, 193
+  ASSERT(uint256_bit_is_set(num,64) == 1);
+  ASSERT(uint256_bit_is_set(num,129) == 1);
+  ASSERT(uint256_bit_is_set(num,192) == 1);
+  ASSERT(uint256_bit_is_set(num,193) == 1);
+  ASSERT(uint256_bit_is_set(num,100) == 0);
+  ASSERT(uint256_bit_is_set(num,50) == 0);  
+
+}
+
+
+void test_left_shift(TestObjs *objs) {
+
+
 }

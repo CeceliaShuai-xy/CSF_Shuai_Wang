@@ -223,7 +223,7 @@ int uint256_bit_is_set(UInt256 val, unsigned index) {
   }
 
   uint64_t value = val.data[array_index];
-  if ((value << (index - 64*array_index)) & (uint64_t)1) {
+  if ((value >> (index - 64*array_index)) & (uint64_t)1) {
     return 1;
   } 
   return 0;
