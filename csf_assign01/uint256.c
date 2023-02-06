@@ -10,24 +10,24 @@
 // Only the least-significant 64 bits are initialized directly,
 // all other bits are set to 0.
 UInt256 uint256_create_from_u64(uint64_t val) {
-  UInt256 *result = malloc(sizeof(UInt256));
-  result->data[0] = val;
+  UInt256 result;
+  result.data[0] = val;
   for(int i = 1; i < 4; i++) {
-    result->data[i] = 0;
+    result.data[i] = 0;
   }
-  return *result;
+  return result;
 }
 
 // Create a UInt256 value from an array of 4 uint64_t values.
 // The element at index 0 is the least significant, and the element
 // at index 3 is the most significant.
 UInt256 uint256_create(const uint64_t data[4]) {
-  UInt256 *result = malloc(sizeof(UInt256));
+  UInt256 result;
   for(int i = 0; i < 4; i++) {
-    result->data[i] = data[i];
+    result.data[i] = data[i];
   }
 
-  return *result;
+  return result;
 }
 
 // Helper function to convert a uint64_t to array of binary char
@@ -60,12 +60,11 @@ uint64_t reverse_digit_uint64_t(uint64_t val) {
 }
 
 // Helper function to create two's complement of a UInt256 value
-UInt256 *UInt256_to_twos_complement(UInt256 value) {
+UInt256 UInt256_to_twos_complement(UInt256 value) {
   for (int i = 0; i < 4; i++) {
     value.data[i] = reverse_digit_uint64_t(value.data[i]);
   }
-  UInt256 *negation = malloc(sizeof(UInt256));
-  *negation = uint256_add(uint256_create_from_u64(1U), value);
+  UInt256 negation  = uint256_add(uint256_create_from_u64(1U), value);
   return negation;
 }
 
@@ -196,7 +195,7 @@ UInt256 uint256_add(UInt256 left, UInt256 right) {
 // Cecelia
 UInt256 uint256_sub(UInt256 left, UInt256 right) {
   UInt256 *result = malloc(sizeof(UInt256));
-  *result = uint256_add(left, *UInt256_to_twos_complement(right));
+  *result = uint256_add(left, UInt256_to_twos_complement(right));
   return *result;
 }
 
