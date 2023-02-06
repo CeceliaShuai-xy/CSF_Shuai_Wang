@@ -36,6 +36,9 @@ void test_sub_3(TestObjs *objs);
 void test_mul_1(TestObjs *objs);
 void test_mul_2(TestObjs *objs);
 
+// add more tests
+
+
 int main(int argc, char **argv) {
   if (argc > 1) {
     tctest_testname_to_execute = argv[1];
@@ -47,7 +50,7 @@ int main(int argc, char **argv) {
   TEST(test_create_from_u64);
   TEST(test_create);
   TEST(test_create_from_hex);
-  //TEST(test_format_as_hex);
+  TEST(test_format_as_hex);
   TEST(test_add_1);
   TEST(test_add_2);
   TEST(test_add_3);
