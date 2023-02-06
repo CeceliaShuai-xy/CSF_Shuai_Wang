@@ -37,6 +37,22 @@ void test_mul_1(TestObjs *objs);
 void test_mul_2(TestObjs *objs);
 
 // add more tests
+//ADD
+void test_large_add_0(TestObjs *objs);
+void test_medium_add_0(TestObjs *objs);
+void test_0_add_0(TestObjs *objs);
+//SUB
+void test_large_sub_0(TestObjs *objs);
+void test_medium_sub_0(TestObjs *objs);
+void test_0_sub_0(TestObjs *objs);
+//MUL
+void test_medium_mul_0(TestObjs *objs);
+void test_0_mul_0(TestObjs *objs);
+//Overflow
+void test_add_overflow_by_1(TestObjs *objs);
+void test_add_overflow_partial(TestObjs *objs);
+void test_sub_overflow(TestObjs *objs);
+
 
 
 int main(int argc, char **argv) {
@@ -59,6 +75,23 @@ int main(int argc, char **argv) {
   TEST(test_sub_3);
   TEST(test_mul_1);
   TEST(test_mul_2);
+
+  //add more tests
+  TEST(test_large_add_0);
+  TEST(test_medium_add_0);
+  TEST(test_0_add_0);
+
+  TEST(test_large_sub_0);
+  TEST(test_medium_sub_0);
+  TEST(test_0_sub_0);
+
+  TEST(test_0_mul_0);
+  TEST(test_medium_mul_0);
+
+  TEST(test_add_overflow_by_1);
+  TEST(test_add_overflow_partial);
+  TEST(test_sub_overflow);
+
 
   TEST_FINI();
 }
@@ -332,4 +365,178 @@ void test_mul_2(TestObjs *objs) {
   ASSERT(0xe6117fa57cddf52eUL == result.data[1]);
   ASSERT(0x61abad710163aa9bUL == result.data[2]);
   ASSERT(0x991f2125eacd3UL == result.data[3]);
+}
+
+//Test adding 0 to large UInt256
+void test_large_add_0(TestObjs *objs) {
+  (void) objs;
+
+  UInt256 left, sum; // right is just 0
+
+  // 6841833df5f9f210b6ce1f22962b30dfaa3391e4fd1012fb8b718e8b4ab5ae6 + 0UL = 6841833df5f9f210b6ce1f22962b30dfaa3391e4fd1012fb8b718e8b4ab5ae6
+  left.data[0] = 0xb8b718e8b4ab5ae6UL;
+  left.data[1] = 0xfaa3391e4fd1012fUL;
+  left.data[2] = 0x0b6ce1f22962b30dUL;
+  left.data[3] = 0x6841833df5f9f21UL;
+
+  sum = uint256_add(left, objs->zero);
+  ASSERT(0xb8b718e8b4ab5ae6UL == sum.data[0]);
+  ASSERT(0xfaa3391e4fd1012fUL == sum.data[1]);
+  ASSERT(0x0b6ce1f22962b30dUL == sum.data[2]);
+  ASSERT(0x6841833df5f9f21UL == sum.data[3]);
+
+}
+
+// Test adding 0 to medium UInt256
+void test_medium_add_0(TestObjs *objs) {
+  (void) objs;
+
+  UInt256 left, result;//right is 0
+  left.data[0] = 0xf14f173b16d81718UL;
+  left.data[1] = 0x0UL;
+  left.data[2] = 0x0UL;
+  left.data[3] = 0x0UL;
+
+  result = uint256_add(left, objs->zero);
+  ASSERT(0xf14f173b16d81718UL == result.data[0]);
+  ASSERT(0x0UL == result.data[1]);
+  ASSERT(0x0UL == result.data[2]);
+  ASSERT(0x0UL == result.data[3]);
+
+}
+
+// Test adding 0 to 0
+void test_0_add_0(TestObjs *objs) {
+  UInt256 sum;
+
+  sum = uint256_add(objs->zero, objs->zero);
+
+  // after adding 0 to 0, sum should still be 0
+  ASSERT(0UL == sum.data[3]);
+  ASSERT(0UL == sum.data[2]);
+  ASSERT(0UL == sum.data[1]);
+  ASSERT(0UL == sum.data[0]);
+}
+
+
+//Test subtract 0 from large UInt256
+void test_large_sub_0(TestObjs *objs) {
+
+  (void) objs;
+  
+  UInt256 left, result; //right is just 0
+
+  //c6d49781b470626e16432d86c8231421559134a915617afc2204663b21c0bf7 - 0 = c6d49781b470626e16432d86c8231421559134a915617afc2204663b21c0bf7
+  left.data[0] = 0xc2204663b21c0bf7UL;
+  left.data[1] = 0x1559134a915617afUL;
+  left.data[2] = 0xe16432d86c823142UL;
+  left.data[3] = 0xc6d49781b47062UL;
+
+  result = uint256_sub(left, objs->zero);
+  // after subtracting 0 from larg1, sum should still equal to large1
+  ASSERT(0xc2204663b21c0bf7UL == left.data[0]);
+  ASSERT(0x1559134a915617afUL == result.data[1]);
+  ASSERT(0xe16432d86c823142UL == result.data[2]);
+  ASSERT(0xc6d49781b47062UL == result.data[3]);
+}
+
+void test_medium_sub_0(TestObjs *objs) {
+  (void) objs;
+  
+  UInt256 left, result; //right is just 0
+
+  left.data[0] = 0x010f734368aaad66UL;
+  left.data[1] = 0xaf7939833038cfaUL;
+  left.data[2] = 0x0UL;
+  left.data[3] = 0x0UL;
+
+  result = uint256_sub(left, objs->zero);
+  // after subtracting 0 from larg1, sum should still equal to large1
+  ASSERT(0x010f734368aaad66UL == left.data[0]);
+  ASSERT(0xaf7939833038cfaUL == result.data[1]);
+  ASSERT(0x0UL == result.data[2]);
+  ASSERT(0x0ULL == result.data[3]);
+}
+
+void test_0_sub_0(TestObjs *objs) {
+  UInt256 result;
+
+  result = uint256_sub(objs->zero, objs->zero);
+  ASSERT(0UL == result.data[3]);
+  ASSERT(0UL == result.data[2]);
+  ASSERT(0UL == result.data[1]);
+  ASSERT(0UL == result.data[0]);
+}
+
+void test_medium_mul_0(TestObjs *objs) {
+  (void) objs;
+
+  UInt256 left, result; // right is 0
+
+  // 761544a98b82abc63f23766d1391782 * 0UL = 0UL
+  left.data[0] = 0x63f23766d1391782UL;
+  left.data[1] = 0x761544a98b82abcUL;
+  left.data[2] = 0x0UL;
+  left.data[3] = 0x0UL;
+
+  result = uint256_mul(left, objs->zero);
+  ASSERT(0x0UL == result.data[0]);
+  ASSERT(0x0UL == result.data[1]);
+  ASSERT(0x0UL == result.data[2]);
+  ASSERT(0x0UL == result.data[3]);
+
+}
+
+void test_0_mul_0(TestObjs *objs) {
+  UInt256 result;
+
+  result = uint256_mul(objs->zero, objs->zero);
+  ASSERT(0x0UL == result.data[0]);
+  ASSERT(0x0UL == result.data[1]);
+  ASSERT(0x0UL == result.data[2]);
+  ASSERT(0x0UL == result.data[3]);
+}
+
+void test_add_overflow_by_1(TestObjs *objs){
+  (void) objs;
+  UInt256 max;
+  for (int i = 0; i < 4; ++i) {
+    max.data[i] = ~(0UL); 
+  }
+
+  UInt256 one = uint256_create_from_u64(1UL);
+
+  UInt256 sum = uint256_add(max, one);
+
+  // these assertions should succeed
+  ASSERT(sum.data[3] == 0UL);
+  ASSERT(sum.data[2] == 0UL);
+  ASSERT(sum.data[1] == 0UL);
+  ASSERT(sum.data[0] == 0UL);
+}
+
+void test_add_overflow_partial(TestObjs *objs){
+  (void) objs;
+  UInt256 max, one;
+  for (int i = 0; i < 4; ++i) {
+    max.data[i] = ~(0UL); 
+  }
+
+  one.data[0] = 0UL;
+  one.data[1] = 1UL;
+  one.data[2] = 0UL;
+  one.data[3] = 0UL;
+
+  // overflow occurs from data[1] to data[3] (become all 0s), but data[0] preserves
+  UInt256 sum = uint256_add(max, one);
+
+  // these assertions should succeed
+  ASSERT(sum.data[3] == 0UL);
+  ASSERT(sum.data[2] == 0UL);
+  ASSERT(sum.data[1] == 0UL);
+  ASSERT(sum.data[0] == max.data[0]);
+}
+
+void test_sub_overflow(TestObjs *objs){
+
 }
