@@ -35,6 +35,7 @@ void test_sub_2(TestObjs *objs);
 void test_sub_3(TestObjs *objs);
 void test_mul_1(TestObjs *objs);
 void test_mul_2(TestObjs *objs);
+void test_left_shift_256(TestObjs *objs);
 
 // add more tests
 //ADD
@@ -57,6 +58,7 @@ void test_sub_overflow_by_more(TestObjs *objs);
 void test_bit_is_set(TestObjs *objs);
 void test_left_shift_simple(TestObjs *objs);
 void test_left_shift_complex(TestObjs *objs);
+void test_left_shift_65(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -96,12 +98,11 @@ int main(int argc, char **argv) {
   TEST(test_sub_overflow_by_1);
   TEST(test_sub_overflow_by_more);  
 
-
-
   TEST(test_bit_is_set);
   TEST(test_left_shift_simple);
   TEST(test_left_shift_complex);
-
+  TEST(test_left_shift_65);
+  TEST(test_left_shift_256);
   
   
   TEST_FINI();
@@ -635,4 +636,35 @@ void test_left_shift_complex(TestObjs *objs) {
   ASSERT(shifted.data[1] == 1UL<<5);
   ASSERT(shifted.data[2] == 0UL);
   ASSERT(shifted.data[3] == ~(0UL) << 5);
+}
+
+void test_left_shift_65(TestObjs *objs) {
+  (void) *objs;
+  UInt256 val;
+  val.data[0] = 3UL;
+  val.data[1] = 1UL;
+  val.data[2] = 0UL;
+  val.data[3] = ~(0UL);
+  // so the data looks like
+  // [0..011][0...1][0..0][1...1] = 1...1|0...0|0...1|0...11
+  UInt256 shifted = uint256_leftshift(val,65);
+  ASSERT(shifted.data[0] == 0UL);
+  ASSERT(shifted.data[1] == 6UL);
+  ASSERT(shifted.data[2] == 2UL);
+  ASSERT(shifted.data[3] == 0UL);
+}
+
+void test_left_shift_256(TestObjs *objs) {
+  // test an edge case with all bits shifted out of scope
+  (void) *objs;
+  UInt256 val;
+  val.data[0] = ~(0UL);
+  val.data[1] = ~(0UL);
+  val.data[2] = ~(0UL);
+  val.data[3] = ~(0UL);
+  UInt256 shifted = uint256_leftshift(val,90);
+  ASSERT(shifted.data[0] == 0UL);
+  ASSERT(shifted.data[1] == ~(0UL)<<26);
+  ASSERT(shifted.data[2] == ~(0UL));
+  ASSERT(shifted.data[3] == ~(0UL));
 }
