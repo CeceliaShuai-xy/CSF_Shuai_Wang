@@ -200,9 +200,9 @@ UInt256 uint256_add(UInt256 left, UInt256 right) {
 
     uint64_t individual_sum = individual_left + individual_right + hasCarriedOver;
     if (individual_sum < individual_left || individual_sum < individual_right) {
-      hasCarriedOver = 0U;
-    } else {
       hasCarriedOver = 1U;
+    } else {
+      hasCarriedOver = 0U;
     }
     sum.data[i] = individual_sum;
 
