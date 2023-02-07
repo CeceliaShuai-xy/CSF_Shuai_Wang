@@ -23,10 +23,14 @@ int check(UInt256 val, uint64_t val3, uint64_t val2, uint64_t val1, uint64_t val
 
 // Declarations of test functions
 void test_get_bits(TestObjs *objs);
+void test_get_bits2(TestObjs *objs);
 void test_create_from_u64(TestObjs *objs);
+void test_create_from_u64_2(TestObjs *objs);
 void test_create(TestObjs *objs);
 void test_create_from_hex(TestObjs *objs);
+void test_create_from_hex_over64(TestObjs *objs);
 void test_format_as_hex(TestObjs *objs);
+void test_format_as_hex_large(TestObjs *objs);
 void test_add_1(TestObjs *objs);
 void test_add_2(TestObjs *objs);
 void test_add_3(TestObjs *objs);
@@ -55,6 +59,7 @@ void test_add_overflow_by_more(TestObjs *objs);
 void test_sub_overflow_by_1(TestObjs *objs);
 void test_sub_overflow_by_more(TestObjs *objs);
 
+//Test for helper functions
 void test_bit_is_set(TestObjs *objs);
 void test_left_shift_simple(TestObjs *objs);
 void test_left_shift_complex(TestObjs *objs);
@@ -68,10 +73,14 @@ int main(int argc, char **argv) {
   TEST_INIT();
 
   TEST(test_get_bits);
+  TEST(test_get_bits2);
   TEST(test_create_from_u64);
+  TEST(test_create_from_u64_2);
   TEST(test_create);
   TEST(test_create_from_hex);
+  TEST(test_create_from_hex_over64);
   TEST(test_format_as_hex);
+  TEST(test_format_as_hex_large);
   TEST(test_add_1);
   TEST(test_add_2);
   TEST(test_add_3);
@@ -160,12 +169,25 @@ void test_get_bits(TestObjs *objs) {
   ASSERT(1U == uint256_get_bits(objs->one, 0));
 }
 
+void test_get_bits2(TestObjs *objs) {
+    ASSERT(0xAA == uint256_get_bits(objs->large1, 3));
+    ASSERT(0xBB == uint256_get_bits(objs->large1, 2));
+    ASSERT(0xCC == uint256_get_bits(objs->large1, 1));
+    ASSERT(0xDD == uint256_get_bits(objs->large1, 0));
+}
+
 void test_create_from_u64(TestObjs *objs) {
   objs->zero = uint256_create_from_u64(0U);
   objs->one = uint256_create_from_u64(1U);
 
   ASSERT(check(objs->zero, 0U, 0U, 0U, 0U));
   ASSERT(check(objs->one, 0U, 0U, 0U, 1U));
+}
+
+void test_create_from_u64_2(TestObjs *objs) {
+  (void) objs;
+  UInt256 test = uint256_create_from_u64(0xAA);
+  ASSERT(check(test, 0U, 0U, 0U, 0xAA));
 }
 
 void test_create(TestObjs *objs) {
@@ -194,11 +216,16 @@ void test_create_from_hex(TestObjs *objs) {
   val = uint256_create_from_hex(objs->hex2);
   ASSERT(check(val, 0x0UL, 0x0UL, 0x0UL, 0xcafeUL));
 
-  //TODO: Added Tests 
   val = uint256_create_from_hex(objs->hex3);
-  // objs->hex3 = "4a4b72ebb654226ef77ed83d884f494   0e4243bc3913ceaf   5781b28d25fb00b0";
   ASSERT(check(val, 0x4a4b72ebb654226UL, 0xef77ed83d884f494UL, 0x0e4243bc3913ceafUL, 0x5781b28d25fb00b0UL));
 }
+
+void test_create_from_hex_over64(TestObjs *objs) {
+  (void) objs;
+  UInt256 val = uint256_create_from_hex("aaaaa4a4b72ebb654226ef77ed83d884f4940e4243bc3913ceaf5781b28d25fb00b0");
+  ASSERT(check(val, 0xa4a4b72ebb654226UL, 0xef77ed83d884f494UL, 0x0e4243bc3913ceafUL, 0x5781b28d25fb00b0UL));
+}
+
 
 void test_format_as_hex(TestObjs *objs) {
   char *s;
@@ -211,6 +238,21 @@ void test_format_as_hex(TestObjs *objs) {
   ASSERT(0 == strcmp("1", s));
   free(s);
 }
+
+void test_format_as_hex_large(TestObjs *objs) {
+  (void) objs;
+  char *s;
+  UInt256 val;
+  val.data[0] = 0xffffffffffffffffUL;
+  val.data[1] = 0xffffffffffffffffUL;
+  val.data[2] = 0xffffffffffffffffUL;
+  val.data[3] = 0xffffffffffffffffUL;
+  s = uint256_format_as_hex(val);
+  ASSERT(0 == strcmp("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", s));
+  free(s);
+}
+
+
 
 void test_add_1(TestObjs *objs) {
   // basic addition tests

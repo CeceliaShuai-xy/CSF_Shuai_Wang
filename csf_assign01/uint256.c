@@ -25,22 +25,8 @@ UInt256 uint256_create(const uint64_t data[4]) {
   for(int i = 0; i < 4; i++) {
     result.data[i] = data[i];
   }
-
   return result;
 }
-
-// Helper function to convert a uint64_t to array of binary char for easier shifting
-char *uint64_to_binary(uint64_t val) {
-  char *binary = malloc(sizeof(char) * 64);
-  int count = 0;
-  for (int i = 63; i >= 0; i--) {
-    char c = val & ((uint64_t)1 << i) ? '1' : '0';
-    *(binary + count) = c;
-    count++;
-  }
-  return binary;
-}
-
 
 // Helper function to create two's complement of a UInt256 value
 UInt256 UInt256_to_twos_complement(UInt256 value) {
@@ -52,24 +38,25 @@ UInt256 UInt256_to_twos_complement(UInt256 value) {
 }
 
 // Create a UInt256 value from a string of hexadecimal digits.
-// Gigi
 UInt256 uint256_create_from_hex(const char *hex) {
   UInt256 result;
+  // hex map to Uint256[0] if hex is less than 16 char
   if (strlen(hex) <= 16) {
-    result = uint256_create_from_u64(strtoul(hex, NULL, 16));
-    return result;
+    return uint256_create_from_u64(strtoul(hex, NULL, 16));
   }
+  // make a copy of hex for modification
   char copy[strlen(hex)];
   strcpy(copy, hex);
   char *endptr = copy + strlen(copy);
   result = uint256_create_from_u64(strtoul(endptr - 16, NULL, 16));
   endptr -= 16;
   *endptr = '\0';
+  // break the copied hex in chunk of 16 char or less using '\0' to use strtoul
   for (int i = 1; i < 4; i++) {
-    char * holder = endptr - 16;
-    if (copy < holder) {
-      result.data[i] = strtoul(holder, NULL, 16);
-      endptr = holder;
+    char * holder_ptr = endptr - 16;
+    if (copy < holder_ptr) {
+      result.data[i] = strtoul(holder_ptr, NULL, 16);
+      endptr = holder_ptr;
       *endptr = '\0';
     } else {
       result.data[i] = strtoul(copy, NULL, 16);
@@ -81,11 +68,11 @@ UInt256 uint256_create_from_hex(const char *hex) {
 
 // Return a dynamically-allocated string of hex digits representing the
 // given UInt256 value.
-// Cecelia
 char *uint256_format_as_hex(UInt256 val) {
   char hex_holder[64];
   char *buff = (char*)malloc(sizeof(char)* (16) + 1);
   
+  // convert UInt256 into hex and store each char in hex_holder array
   int counter = 0;
   for (int i = 3; i >= 0; i--) {
     uint64_t data = val.data[i];
@@ -94,15 +81,17 @@ char *uint256_format_as_hex(UInt256 val) {
       hex_holder[counter++] = buff[j];
     }
   }
+  // count the number of leading zeros
   int count_digits = 0;
   int i = 0;
   while(hex_holder[i]=='0') {
     count_digits++;
     i++;
   }
+  // remove leading zeros by copying hex_holder to a new array return_hex
   int hex_length = 64 - count_digits;
   char* return_hex;
-  if (hex_length <= 0) {
+  if (hex_length <= 0) { // edge case where val is 0
     return_hex = malloc(sizeof(char) * 2);
     return_hex[0] = '0';
     return_hex[1] = '\0';
@@ -127,38 +116,30 @@ uint64_t uint256_get_bits(UInt256 val, unsigned index) {
   return bits;
 }
 
-
 // Compute the sum of two UInt256 values.
-// Gigi
 UInt256 uint256_add(UInt256 left, UInt256 right) {
-  // UInt256 *sum = malloc(sizeof(UInt256));
-  // int hasCarried = 0;
-  // for(int i = 0; i < 4; i++) {
-  //   hasCarried = uint64_add(uint64_to_binary(left.data[i]), uint64_to_binary(right.data[i]), hasCarried, sum, i);
-  // }
-  // return *sum;
 
   uint64_t hasCarriedOver = 0;
 
   UInt256 sum = uint256_create_from_u64(0U);
   for (int i = 0; i < 4; i++) {
+    // for each elements in UInt256, find its sum considering overflow from previous elemesnt
     uint64_t individual_left = uint256_get_bits(left, i);
     uint64_t individual_right = uint256_get_bits(right, i);
-
     uint64_t individual_sum = individual_left + individual_right + hasCarriedOver;
+
+    // update overflow
     if (individual_sum < individual_left || individual_sum < individual_right) {
       hasCarriedOver = 1U;
     } else {
       hasCarriedOver = 0U;
     }
     sum.data[i] = individual_sum;
-
   }
   return sum;
 }
 
 // Compute the difference of two UInt256 values.
-// Cecelia
 UInt256 uint256_sub(UInt256 left, UInt256 right) {
   UInt256 result = uint256_add(left, UInt256_to_twos_complement(right));
   return result;
@@ -200,11 +181,11 @@ int uint256_bit_is_set(UInt256 val, unsigned index) {
 }
 
 //Helper function for within 64-bits shift
+//Pre: 0 < shift <=64
 UInt256 uint256_leftshift_piecewise(UInt256 val, unsigned shift) {
   if (shift == 0) {
     return val;
   }
-  // assume 0 < shift <=64
   for (int i = 3; i >= 1; i--) {
     uint64_t value = val.data[i];
     uint64_t old_bits = value<<shift;
@@ -218,6 +199,7 @@ UInt256 uint256_leftshift_piecewise(UInt256 val, unsigned shift) {
 }
 
 // Left shit UInt 256 value by a specified number
+// pre: shift >= 0 
 UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
   if (shift == 0) {
     return val;
@@ -229,46 +211,18 @@ UInt256 uint256_leftshift(UInt256 val, unsigned shift) {
     UInt256 new_val = uint256_create_from_u64(0UL);
     int times = shift/64;
     if (times >= 4) {
+      //shifts take all value out of frame
       return new_val;
     } else {
       int counter = 0;
       int modular = shift%64;
+      //first shift by multiples of 64
       for (int i = times; i < 4; i++) {
         new_val.data[i] = val.data[counter++];
       }
+      //shift the reminding number
       return uint256_leftshift_piecewise(new_val, modular);
     }
   }
-
   return val;
 }
-
-
- /*
-  char old_binary[256];
-  int counter = 0;
-  
-  for (int i = 3; i >= 0; i--) {
-    char* ptr = uint64_to_binary(val.data[i]);
-    for (int j = 0; j < 64; j++) {
-      old_binary[counter++] = ptr[j];
-    }
-    free(ptr);
-  }
-
-  char new_binary[256+1];
-  for(int i = 0; i < 256; i++) {
-    new_binary[i] = '0';
-  }
-  new_binary[256] = '\0';
-  counter = 0;
-  for (int i = shift; i < 256; i++) {
-    new_binary[counter++] = old_binary[i];
-  }
-
-  counter = 0;
-  for (int i = 256-64; i >= 0; i=i-64) {
-    val.data[counter++] = strtoul(&new_binary[i], NULL, 2);
-    new_binary[i] = '\0';
-  }
-  */
