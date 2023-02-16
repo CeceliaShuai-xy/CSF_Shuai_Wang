@@ -7,6 +7,7 @@ int main(void) {
   unsigned offset = 0;
   // leave room for null terminator
   char buff[18]; 
+  buff[17] = '\0';
   // store number of read bytes
   unsigned n = 0; 
   while (1) {
@@ -35,23 +36,20 @@ int main(void) {
       hex_format_byte_as_hex(buff[i-2],sbuf);
       for (int j = 0; j < 3; j++) {
         if (j != 2) {
-          hex_to_printable(sbuf[j]);
-          //s[(i-1)*2 + j] = sbuf[j];
-          s[3*i+j-4] = sbuf[j];
+          s[3*i+j-4] = hex_to_printable(sbuf[j]);
         } 
       }
     }
 
     hex_write_string(s);
 
-    if (n<16) {
-      buff[n-1] = '.';
-      buff[n] = '\n';
-      hex_write_string(buff);
-    } else {
-    buff[16] = '\n';
-    hex_write_string(buff);
+    for (int i = 0; i<n; i++) {
+      buff[i] = hex_to_printable(buff[i]);
     }
+
+    buff[n] = '\n';
+    buff[n+1] = '\0';
+    hex_write_string(buff);
     offset += n;
   }
 }
