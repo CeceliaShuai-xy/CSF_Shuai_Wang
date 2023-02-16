@@ -21,12 +21,12 @@ int main(void) {
     hex_write_string(hex_offset);
 
     // string to write
-    char s[51]; 
+    char s[50]; 
     for (int i = 0; i < 53; i++) {
       s[i] = ' ';
     }
     s[0] = ':';
-    s[52] = '\0';
+    s[51] = '\0';
 
     // string buff
     char sbuf[2];
@@ -45,7 +45,8 @@ int main(void) {
     hex_write_string(s);
 
     if (n<16) {
-      buff[16] = '.';
+      buff[n-1] = '.';
+      buff[n] = '\n';
       hex_write_string(buff);
     } else {
     buff[16] = '\n';
