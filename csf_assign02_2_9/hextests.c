@@ -32,6 +32,8 @@ void textFormatOffset_more(TestObjs *objs);
 void textFormatByteasHex_space(TestObjs *objs);
 void textFormatByteasHex_letters(TestObjs *objs);
 void textFormatByteasHex_symbols(TestObjs *objs);
+void testHexToPrintable_unprintable_edge(TestObjs *objs);
+void testHexToPrintable_printable_edge(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -49,6 +51,8 @@ int main(int argc, char **argv) {
   TEST(textFormatByteasHex_space);
   TEST(textFormatByteasHex_letters);
   TEST(textFormatByteasHex_symbols);
+  TEST(testHexToPrintable_unprintable_edge);
+  TEST(testHexToPrintable_printable_edge);
 
   TEST_FINI();
 
@@ -177,3 +181,14 @@ void textFormatByteasHex_symbols(TestObjs *objs) {
 
 }
 
+void testHexToPrintable_unprintable_edge(TestObjs *objs) {
+  unsigned char val = 31;
+  ASSERT('.' == hex_to_printable(val));
+  val = 127;
+  ASSERT('.' == hex_to_printable(val));
+}
+
+void testHexToPrintable_printable_edge(TestObjs *objs) {
+  ASSERT(' ' == hex_to_printable(32));
+  ASSERT('~' == hex_to_printable(126));
+}
