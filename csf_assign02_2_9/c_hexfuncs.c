@@ -18,12 +18,15 @@ void hex_write_string(const char s[]) {
 }
 
 void hex_format_offset(unsigned offset, char sbuf[]) {
+    // first fill the buffer with 0s
     for (int i = 0; i < 8; i++) {
         sbuf[i] = '0';
     }
+
     unsigned temp_offset = offset;
     unsigned temp;
     int i = 7;
+    // format into hex
     while (temp_offset != 0) {
         temp = temp_offset % 16;
         if (temp < 10) {
@@ -31,9 +34,12 @@ void hex_format_offset(unsigned offset, char sbuf[]) {
         } else {
             temp += 87;
         }
+        // update buffer with hex
         sbuf[i--] = temp;
         temp_offset = temp_offset/16;
     }
+
+    // add null terminator
     sbuf[8] = '\0';
 }
 
