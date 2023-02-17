@@ -28,6 +28,8 @@ void cleanup(TestObjs *objs) {
 void testFormatOffset(TestObjs *objs);
 void testFormatByteAsHex(TestObjs *objs);
 void testHexToPrintable(TestObjs *objs);
+void testHexToPrintable_unprintable_edge(TestObjs *objs);
+void testHexToPrintable_printable_edge(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -36,9 +38,11 @@ int main(int argc, char **argv) {
 
   TEST_INIT();
 
-  // TEST(testFormatOffset);
+  TEST(testFormatOffset);
   TEST(testFormatByteAsHex);
   TEST(testHexToPrintable);
+  TEST(testHexToPrintable_unprintable_edge);
+  TEST(testHexToPrintable_printable_edge);
 
   TEST_FINI();
 
@@ -64,4 +68,16 @@ void testFormatByteAsHex(TestObjs *objs) {
 void testHexToPrintable(TestObjs *objs) {
   ASSERT('H' == hex_to_printable(objs->test_data_1[0]));
   ASSERT('.' == hex_to_printable(objs->test_data_1[13]));
+}
+
+void testHexToPrintable_unprintable_edge(TestObjs *objs) {
+  unsigned char val = 31;
+  ASSERT('.' == hex_to_printable(val));
+  val = 127;
+  ASSERT('.' == hex_to_printable(val));
+}
+
+void testHexToPrintable_printable_edge(TestObjs *objs) {
+  ASSERT(' ' == hex_to_printable(32));
+  ASSERT('~' == hex_to_printable(126));
 }

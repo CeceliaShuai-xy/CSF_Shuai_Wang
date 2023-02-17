@@ -16,10 +16,13 @@
 
 
 hex_read:
+	ret
 
 hex_write_string:
+	ret
 
 hex_format_offset:
+	ret
 
 hex_format_byte_as_hex:
 	movq $2, %r13
@@ -57,7 +60,7 @@ hex_format_byte_as_hex:
 
 hex_to_printable:
 	cmpb $32, %dil
-	jbe .LReturnDots
+	jb .LReturnDots
 	cmpb $127, %dil
 	jae .LReturnDots
 	movb %dil, %al

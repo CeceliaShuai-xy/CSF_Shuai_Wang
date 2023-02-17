@@ -53,22 +53,6 @@ void hex_format_byte_as_hex(unsigned char byteval, char sbuf[]) {
         sbuf[0] = first + 87;
     }
     sbuf[2] = '\0';
-    // unsigned temp_offset = byteval;
-    // unsigned temp;
-    // sbuf[0] = '0';
-    // sbuf[1] = '0';
-    // int i = 1;
-    // while (temp_offset != 0) {
-    //     temp = temp_offset % 16;
-    //     if (temp < 10) {
-    //         temp += 48;
-    //     } else {
-    //         temp += 87;
-    //     }
-    //     sbuf[i--] = temp;
-    //     temp_offset = temp_offset/16;
-    // }
-
 }
 
 char hex_to_printable(unsigned char byteval) {
