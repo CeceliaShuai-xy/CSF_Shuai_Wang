@@ -22,8 +22,10 @@ int main(void) {
     hex_write_string(hex_offset);
 
     // string to write
-    char s[50]; 
-    for (int i = 0; i < 53; i++) {
+    // 3 spaces + ':' + 15 inbetween spaces + 16*2 = 51
+    // 51+1 = 52 add one for null terminator
+    char s[52]; 
+    for (int i = 0; i < 52; i++) {
       s[i] = ' ';
     }
     s[0] = ':';
