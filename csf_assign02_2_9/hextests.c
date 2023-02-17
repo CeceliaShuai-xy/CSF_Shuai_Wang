@@ -32,6 +32,7 @@ void textFormatOffset_more(TestObjs *objs);
 void textFormatByteasHex_space(TestObjs *objs);
 void textFormatByteasHex_letters(TestObjs *objs);
 void textFormatByteasHex_symbols(TestObjs *objs);
+void textFormatByteasHex_newline(TestObjs *objs);
 void testHexToPrintable_unprintable_edge(TestObjs *objs);
 void testHexToPrintable_printable_edge(TestObjs *objs);
 
@@ -51,6 +52,7 @@ int main(int argc, char **argv) {
   TEST(textFormatByteasHex_space);
   TEST(textFormatByteasHex_letters);
   TEST(textFormatByteasHex_symbols);
+  TEST(textFormatByteasHex_newline);
   TEST(testHexToPrintable_unprintable_edge);
   TEST(testHexToPrintable_printable_edge);
 
@@ -179,6 +181,14 @@ void textFormatByteasHex_symbols(TestObjs *objs) {
   hex_format_byte_as_hex(')', buf);
   ASSERT(0 == strcmp(buf, "29"));
 
+}
+
+void textFormatByteasHex_newline(TestObjs *objs) {
+  (void) objs; // suppress warning about unused parameter
+  char buf[16];
+  
+  hex_format_byte_as_hex('\n', buf);
+  ASSERT(0 == strcmp(buf, "0a"));
 }
 
 void testHexToPrintable_unprintable_edge(TestObjs *objs) {
