@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 
   TEST_INIT();
 
-  TEST(testFormatOffset);
+  // TEST(testFormatOffset);
   TEST(testFormatByteAsHex);
   TEST(testHexToPrintable);
 

@@ -38,6 +38,21 @@ void hex_format_offset(unsigned offset, char sbuf[]) {
 }
 
 void hex_format_byte_as_hex(unsigned char byteval, char sbuf[]) {
+    unsigned char temp_byteval = byteval;
+    unsigned char second = temp_byteval & 15;
+    unsigned char first = temp_byteval >> 4;
+    if (second < 10) {
+        sbuf[1] = second + 48;
+    } else {
+        sbuf[1] = second + 87;
+    }
+
+    if (first < 10) {
+        sbuf[0] = first + 48;
+    } else {
+        sbuf[0] = first + 87;
+    }
+    sbuf[2] = '\0';
     // unsigned temp_offset = byteval;
     // unsigned temp;
     // sbuf[0] = '0';
@@ -53,20 +68,7 @@ void hex_format_byte_as_hex(unsigned char byteval, char sbuf[]) {
     //     sbuf[i--] = temp;
     //     temp_offset = temp_offset/16;
     // }
-    unsigned temp_byteval = byteval % 16;
-    if (temp_byteval < 10) {
-        sbuf[1] = temp_byteval + 48;
-    } else {
-        sbuf[1] = temp_byteval + 87;
-    }
-    temp_byteval = byteval/16 % 16;
 
-    if (temp_byteval < 10) {
-        sbuf[0] = temp_byteval + 48;
-    } else {
-        sbuf[0] = temp_byteval + 87;
-    }
-    sbuf[2] = '\0';
 }
 
 char hex_to_printable(unsigned char byteval) {
