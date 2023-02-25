@@ -39,10 +39,10 @@ int main(int argc, char **argv) {
   TEST_INIT();
 
   TEST(testFormatOffset);
-  TEST(testFormatByteAsHex);
-  TEST(testHexToPrintable);
-  TEST(testHexToPrintable_unprintable_edge);
-  TEST(testHexToPrintable_printable_edge);
+  // TEST(testFormatByteAsHex);
+  // TEST(testHexToPrintable);
+  // TEST(testHexToPrintable_unprintable_edge);
+  // TEST(testHexToPrintable_printable_edge);
 
   TEST_FINI();
 

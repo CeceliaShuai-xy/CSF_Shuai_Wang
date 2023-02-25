@@ -16,15 +16,78 @@
 
 
 hex_read:
+	subq $8, %rsp
+	leaq (%rdi), %rsi
+	movq $1, %rdi
+	movq $16, %rdx
+	call read
+	addq $8, %rsp
 	ret
 
 hex_write_string:
+	pushq %r12 					/* use r12 as a count index to the length of the string*/
+	movq $0, %r12
+.LStartWhileHexWrite:
+	cmpq $0, (%rdi, %r12, 1)
+	je .LEndWhileHexWrite
+	incq %r12
+	jmp .LStartWhileHexWrite
+
+.LEndWhileHexWrite:
+	leaq (%rdi), %rsi
+	movq $1, %rdi
+	movq %r12, %rdx
+	call write
+	popq %r12
 	ret
 
+
 hex_format_offset:
+	pushq %r12
+	movq $0, %r10
+.LStartForSetToZero:
+	cmpq $8, %r10
+	jae .LEndForSetToZero
+	movq $48, (%rsi, %r10, 1)
+	incq %r10
+	jmp .LStartForSetToZero
+	
+.LEndForSetToZero:
+	movq $7, %r10					/* use r10 as counter index */
+	movl $15, %r12d					/* r12d temp */
+
+.LStartWhileOffset:
+	movl $15, %r12d	
+	cmpl $0, %edi
+	je .LEndWhileOffset
+	andl %edi, %r12d
+	cmpl $10, %r12d
+	jae .LAddLetterOffset
+	movl %r12d, %r11d
+	addl $48, %r11d
+	movb %r11b, (%rsi, %r10, 1)
+	decq %r10
+	shrl $4, %edi
+	jmp .LStartWhileOffset
+
+.LAddLetterOffset:
+	movl %r12d, %r11d
+	addl $87, %r11d
+	movb %r11b, (%rsi, %r10, 1)
+	decq %r10
+	shrl $4, %edi
+	jmp .LStartWhileOffset
+
+.LEndWhileOffset:
+	movq $ 8, %r10
+	movb $0, (%rsi, %r10, 1)
+	popq %r12
 	ret
 
 hex_format_byte_as_hex:
+	pushq %r13 					/* use r13 as a index counter*/
+	pushq %r12					/* use r12 as a temp value holder */
+	subq $8, %rsp				/* stack alignment(optional)*/
 	movq $2, %r13
 	movb $0, (%rsi, %r13, 1)
 	decq %r13
@@ -43,6 +106,9 @@ hex_format_byte_as_hex:
 	jae .LPutLetterInFirst
 	addb $48, %r14b
 	movb %r14b, (%rsi, %r13, 1)
+	addq $8, %rsp
+	popq %r12
+	popq %r13
 	ret
 
 .LPutLetterInSecond:
@@ -53,6 +119,9 @@ hex_format_byte_as_hex:
 .LPutLetterInFirst:
 	addb $87, %r14b
 	movb %r14b, (%rsi, %r13, 1)
+	addq $8, %rsp
+	popq %r12
+	popq %r13
 	ret
 
 

@@ -21,18 +21,20 @@ void hex_format_offset(unsigned offset, char sbuf[]) {
     for (int i = 0; i < 8; i++) {
         sbuf[i] = '0';
     }
-    unsigned temp_offset = offset;
-    unsigned temp;
+    unsigned temp_offset = offset; //use edi for temp_offset
+    unsigned temp;  // use r11d for temp
     int i = 7;
+    // format into hex
     while (temp_offset != 0) {
-        temp = temp_offset % 16;
+        temp = temp_offset & 15;
         if (temp < 10) {
             temp += 48;
         } else {
             temp += 87;
         }
+        // update buffer with hex
         sbuf[i--] = temp;
-        temp_offset = temp_offset/16;
+        temp_offset = temp_offset >> 4;
     }
     sbuf[8] = '\0';
 }
