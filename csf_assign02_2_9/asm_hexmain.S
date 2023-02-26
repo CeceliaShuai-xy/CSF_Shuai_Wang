@@ -65,7 +65,9 @@ main:
 	movq $empty2, %rdi
 	call hex_write_string
 	movb $10, (%rbp, %r12, 1)
-	movb $0, -1(%rbp, %r12, 1)
+	movq %r12, %r10
+	incq %r10
+	movb $0, (%rbp, %r10, 1)
 	leaq (%rbp), %rdi
 	call hex_write_string
 	addl %r12d, %r13d
@@ -78,6 +80,7 @@ main:
 	popq %r13
 	popq %r12
 	popq %rbp
+	movq $0, %rax
 	ret
 
 
