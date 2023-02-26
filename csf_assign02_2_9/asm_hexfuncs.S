@@ -17,8 +17,8 @@
 
 hex_read:
 	subq $8, %rsp
-	leaq (%rdi), %rsi
-	movq $1, %rdi
+	movq %rdi, %rsi
+	movl $0, %edi
 	movq $16, %rdx
 	call read
 	addq $8, %rsp
@@ -28,7 +28,7 @@ hex_write_string:
 	pushq %r12 					/* use r12 as a count index to the length of the string*/
 	movq $0, %r12
 .LStartWhileHexWrite:
-	cmpq $0, (%rdi, %r12, 1)
+	cmpb $0, (%rdi, %r12, 1)
 	je .LEndWhileHexWrite
 	incq %r12
 	jmp .LStartWhileHexWrite
@@ -40,6 +40,7 @@ hex_write_string:
 	call write
 	popq %r12
 	ret
+
 
 
 hex_format_offset:
@@ -87,7 +88,7 @@ hex_format_offset:
 hex_format_byte_as_hex:
 	pushq %r13 					/* use r13 as a index counter*/
 	pushq %r12					/* use r12 as a temp value holder */
-	subq $8, %rsp				/* stack alignment(optional)*/
+	pushq %r14					/* stack alignment(optional)*/
 	movq $2, %r13
 	movb $0, (%rsi, %r13, 1)
 	decq %r13
@@ -106,7 +107,7 @@ hex_format_byte_as_hex:
 	jae .LPutLetterInFirst
 	addb $48, %r14b
 	movb %r14b, (%rsi, %r13, 1)
-	addq $8, %rsp
+	popq %r14
 	popq %r12
 	popq %r13
 	ret
@@ -119,7 +120,7 @@ hex_format_byte_as_hex:
 .LPutLetterInFirst:
 	addb $87, %r14b
 	movb %r14b, (%rsi, %r13, 1)
-	addq $8, %rsp
+	popq %r14
 	popq %r12
 	popq %r13
 	ret

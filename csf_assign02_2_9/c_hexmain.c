@@ -61,4 +61,5 @@ int main(void) {
     // update offset
     offset += n;
   }
+  return 0;
 }
