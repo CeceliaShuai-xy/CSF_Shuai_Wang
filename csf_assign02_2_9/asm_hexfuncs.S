@@ -45,63 +45,63 @@ hex_write_string:
 
 hex_format_offset:
 	pushq %r12
-	movq $0, %r10
+	movq $0, %r10					/* use r10 as index i*/
 .LStartForSetToZero:
-	cmpq $8, %r10
-	jae .LEndForSetToZero
-	movq $48, (%rsi, %r10, 1)
-	incq %r10
+	cmpq $8, %r10					/* for loop condition */
+	jae .LEndForSetToZero			
+	movq $48, (%rsi, %r10, 1)		/* put '0' to sbuf */
+	incq %r10						/* move index i */
 	jmp .LStartForSetToZero
 	
 .LEndForSetToZero:
-	movq $7, %r10					/* use r10 as counter index */
-	movl $15, %r12d					/* r12d temp */
+	movq $7, %r10					/* use r10 as counter index*/
+	movl $15, %r12d					/* use r12d as variable temp */
 
 .LStartWhileOffset:
-	movl $15, %r12d	
-	cmpl $0, %edi
+	movl $15, %r12d					
+	cmpl $0, %edi					/* while condition, compare temp_offset (%edi)*/
 	je .LEndWhileOffset
-	andl %edi, %r12d
+	andl %edi, %r12d				
 	cmpl $10, %r12d
 	jae .LAddLetterOffset
 	movl %r12d, %r11d
 	addl $48, %r11d
-	movb %r11b, (%rsi, %r10, 1)
+	movb %r11b, (%rsi, %r10, 1)		/* update sbuf */
 	decq %r10
 	shrl $4, %edi
-	jmp .LStartWhileOffset
+	jmp .LStartWhileOffset			/* update temp_offset */
 
 .LAddLetterOffset:
 	movl %r12d, %r11d
-	addl $87, %r11d
-	movb %r11b, (%rsi, %r10, 1)
+	addl $87, %r11d					
+	movb %r11b, (%rsi, %r10, 1) 	/* update sbuf */
 	decq %r10
-	shrl $4, %edi
+	shrl $4, %edi					/* update temp_offset */
 	jmp .LStartWhileOffset
 
 .LEndWhileOffset:
-	movq $ 8, %r10
-	movb $0, (%rsi, %r10, 1)
+	movq $ 8, %r10					
+	movb $0, (%rsi, %r10, 1)		/* add null terminator at the end of sbuf*/
 	popq %r12
 	ret
 
 hex_format_byte_as_hex:
-	pushq %r13 					/* use r13 as a index counter*/
+	pushq %r13 					/* use r13 as a index counter */
 	pushq %r12					/* use r12 as a temp value holder */
 	pushq %r14					/* stack alignment(optional)*/
 	movq $2, %r13
-	movb $0, (%rsi, %r13, 1)
-	decq %r13
-	movb $15, %r12b
-	andb %dil, %r12b
-	cmpb $10, %r12b
+	movb $0, (%rsi, %r13, 1)	/* put null terminator at the end (index 2) of sbuf*/
+	decq %r13					
+	movb $15, %r12b				/* r12 unsigned char variable second */
+	andb %dil, %r12b			
+	cmpb $10, %r12b	
 	jae .LPutLetterInSecond
 	addb $48, %r12b
 	movb %r12b, (%rsi, %r13, 1)
 
 .LStartFirst:
-	decq %r13
-	movb %dil, %r14b
+	decq %r13					
+	movb %dil, %r14b			/* r14 unsigned char variable first */
 	shrb $4, %r14b
 	cmpb $10, %r14b
 	jae .LPutLetterInFirst
@@ -114,7 +114,7 @@ hex_format_byte_as_hex:
 
 .LPutLetterInSecond:
 	addb $87, %r12b
-	movb %r12b, (%rsi, %r13, 1)
+	movb %r12b, (%rsi, %r13, 1)		/* update sbuf */
 	jmp .LStartFirst
 
 .LPutLetterInFirst:
@@ -129,14 +129,14 @@ hex_format_byte_as_hex:
 
 
 hex_to_printable:
-	cmpb $32, %dil
+	cmpb $32, %dil			/* check if valid */
 	jb .LReturnDots
-	cmpb $127, %dil
+	cmpb $127, %dil			/* check if valid */
 	jae .LReturnDots
-	movb %dil, %al
+	movb %dil, %al			/* if valid, return %dil (byteval) itself */
 	ret
 .LReturnDots:
-	movb $46, %al
+	movb $46, %al			/* if invalid, return dot */
 	ret
 
 
