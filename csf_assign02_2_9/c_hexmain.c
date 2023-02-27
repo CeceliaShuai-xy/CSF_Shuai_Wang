@@ -1,5 +1,5 @@
 // C implementation of hexdump main function
-
+/* Cecelia Shuai(xshuai3), Gigi Wang(ywang580) */
 #include "hexfuncs.h"  // this is the only header file which may be included!
 
 int main(void) {

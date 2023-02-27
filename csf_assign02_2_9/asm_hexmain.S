@@ -1,4 +1,5 @@
 /* Hexdump main function, assembly language version */
+/* Cecelia Shuai(xshuai3), Gigi Wang(ywang580) */
 	.section .rodata
 fmtstr:
 	.string ":" 				/* const str variables for formating purposes */

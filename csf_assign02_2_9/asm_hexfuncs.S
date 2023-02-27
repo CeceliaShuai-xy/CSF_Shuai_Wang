@@ -1,5 +1,5 @@
 /* Assembly language implementation of hexdump functions */
-
+/* Cecelia Shuai(xshuai3), Gigi Wang(ywang580) */
 	.section .rodata
 
 	/* TODO: add read-only data such as strings here */
