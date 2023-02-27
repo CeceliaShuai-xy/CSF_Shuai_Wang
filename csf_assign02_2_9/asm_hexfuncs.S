@@ -49,7 +49,7 @@ hex_format_offset:
 .LStartForSetToZero:
 	cmpq $8, %r10					/* for loop condition */
 	jae .LEndForSetToZero			
-	movq $48, (%rsi, %r10, 1)		/* put '0' to sbuf */
+	movb $48, (%rsi, %r10, 1)		/* put '0' to sbuf */
 	incq %r10						/* move index i */
 	jmp .LStartForSetToZero
 	
