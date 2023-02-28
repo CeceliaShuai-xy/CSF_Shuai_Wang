@@ -24,7 +24,7 @@ main:
 	movl $0, %r13d				/* initialize offset as 0 */
 .LStartWhile:
 	leaq (%rbp), %rdi			/* load the addr of buff, as the first arg into hex_read */
-	call hex_read				
+	call hex_read				/* return n val in eax */
 	movl %eax, %r12d			/* save the ouput n val in %r12 */
 	cmpl $0, %r12d				
 	je .LEndWhile				/* end while when nothing to read from */
@@ -43,7 +43,7 @@ main:
 	leaq -27(%rbp), %rsi		/* load addr of sbuf as second arg */
 	call hex_format_byte_as_hex 
 	movb (%rbp, %r14, 1), %dil	/* load addr of buf as first arg */
-	call hex_to_printable	
+	call hex_to_printable		/* the returned al will be the printable char */
 	movb %al, (%rbp, %r14, 1) 	/* update buff[i] to printable char */
 	movq $empty, %rdi			/* use empty string as the first arg */
 	call hex_write_string		/* print format string */
