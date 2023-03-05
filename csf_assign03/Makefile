@@ -1,55 +1,42 @@
-#
-# Makefile for CSF Assignment 2
-#
-# You should not need to change anything in this makefile
-#
+CC = g++
+CONSERVATIVE_FLAGS = -std=c++11 -Wall -Wextra -pedantic
+DEBUGGING_FLAGS = -g -O0
+CFLAGS = $(CONSERVATIVE_FLAGS) $(DEBUGGING_FLAGS)
 
-C_SRCS = c_hexfuncs.c c_hexmain.c hextests.c tctest.c
-CFLAGS = -g -Og -no-pie -Wall -std=gnu11
 
-ASM_SRCS = asm_hexfuncs.S asm_hexmain.S
-ASMFLAGS = -g -no-pie
+chess: main.o Board.o Game.o CreatePiece.o Bishop.o King.o Knight.o Pawn.o Queen.o Rook.o
+	$(CC) -o chess main.o Board.o Game.o CreatePiece.o Bishop.o King.o Knight.o Pawn.o Queen.o Rook.o
 
-LDFLAGS = -no-pie
+Board.o: Board.cpp Piece.h Pawn.h Rook.h Knight.h Bishop.h Queen.h King.h Mystery.h CreatePiece.h Terminal.h
+	$(CC) -c Board.cpp $(CFLAGS)
 
-%.o : %.c
-	gcc $(CFLAGS) -c $<
+Game.o: Game.cpp Board.h Game.h Piece.h
+	$(CC) -c Game.cpp $(CFLAGS)
 
-%.o : %.S
-	gcc -c $(ASMFLAGS) $*.S -o $*.o
+CreatePiece.o: CreatePiece.cpp Board.h Game.h Piece.h Pawn.h Rook.h Knight.h Bishop.h Queen.h King.h Mystery.h 
+	$(CC) -c CreatePiece.cpp $(CFLAGS)
 
-all : c_hextests c_hexdump asm_hextests
+Bishop.o: Bishop.cpp Bishop.h Piece.h
+	$(CC) -c Bishop.cpp $(CFLAGS)
 
-c_hextests : c_hexfuncs.o hextests.o tctest.o
-	gcc -o $@ $(LDFLAGS) c_hexfuncs.o hextests.o tctest.o
+King.o: King.cpp King.h Piece.h
+	$(CC) -c King.cpp $(CFLAGS)
 
-c_hexdump : c_hexfuncs.o c_hexmain.o
-	gcc -o $@ $(LDFLAGS) c_hexfuncs.o c_hexmain.o
+Knight.o: Knight.cpp Knight.h Piece.h
+	$(CC) -c Knight.cpp $(CFLAGS)
 
-asm_hextests : asm_hexfuncs.o hextests.o tctest.o
-	gcc -o $@ $(LDFLAGS) asm_hexfuncs.o hextests.o tctest.o
+Pawn.o: Pawn.cpp Pawn.h Piece.h
+	$(CC) -c Pawn.cpp $(CFLAGS)
 
-asm_hexdump : asm_hexfuncs.o asm_hexmain.o
-	gcc -o $@ $(LDFLAGS) asm_hexfuncs.o asm_hexmain.o
+Queen.o: Queen.cpp Queen.h Piece.h
+	$(CC) -c Queen.cpp $(CFLAGS)
 
-# hexdump program using C main and assembly language functions
-casm_hexdump : asm_hexfuncs.o c_hexmain.o
-	gcc -o $@ $(LDFLAGS) asm_hexfuncs.o c_hexmain.o
+Rook.o: Rook.cpp Rook.h Piece.h
+	$(CC) -c Rook.cpp $(CFLAGS)
 
-# Use this target to create a zipfile that you can submit to Gradescope
-.PHONY: solution.zip
-solution.zip :
-	rm -f solution.zip
-	zip -9r $@ Makefile README.txt *.h *.c *.S
+main.o: main.cpp Board.h Game.h Piece.h Pawn.h Rook.h Knight.h Bishop.h Queen.h King.h Mystery.h 
+	$(CC) -c main.cpp $(CFLAGS)
 
-clean :
-	rm -f *.o c_hexdump asm_hexdump casm_hexdump c_hextests asm_hextests \
-		depend.mak solution.zip
-
-depend.mak :
-	touch $@
-
-depend :
-	gcc -M $(C_SRCS) > depend.mak
-
-include depend.mak
+.PHONY: clean all
+clean:
+	rm -f *.o chess
