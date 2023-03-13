@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     cout << allocate << " " << write_command << " " << evictions << endl;
 
     string n; 
-    int hex_num;
+    uint32_t address;
     string load_write;
     string memory;
 
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         stringstream ss(n);
         ss >> load_write;
         ss >> memory;
-        hex_num = std::stoul(memory, 0, 16);
+        address = std::stoul(memory, 0, 16);
 
         // cout << "This is a new line" << endl;
         // cout << "l or w: " << load_write << endl;
