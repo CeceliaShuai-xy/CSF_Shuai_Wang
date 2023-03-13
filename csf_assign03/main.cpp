@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <sstream>
 
 using std::cout;
 using std::endl;
@@ -9,6 +10,7 @@ using std::cerr;
 using std::getline;
 using std::string;
 using std::atoi;
+using std::stringstream;
 
 int main(int argc, char* argv[]) {
 
@@ -57,17 +59,15 @@ int main(int argc, char* argv[]) {
     cout << allocate << " " << write_command << " " << evictions << endl;
 
     string n; 
-    int count = 0;
     int hex_num;
-    while (cin >> n) {
-        if (count == 1) {
-            hex_num = std::stoul(n, 0, 16);
-        }
-        if (count == 2) {
-            count = 0;
-            continue;
-        }
-        count++;
+    string load_write;
+    string memory;
+
+    while (getline(cin,n)) {
+        stringstream ss(n);
+        ss >> load_write;
+        ss >> memory;
+        hex_num = std::stoul(memory, 0, 16);
     }
 
 
