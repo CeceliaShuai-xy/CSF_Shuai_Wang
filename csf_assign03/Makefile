@@ -7,7 +7,7 @@ CFLAGS = $(CONSERVATIVE_FLAGS) $(DEBUGGING_FLAGS)
 csim: main.o 
 	$(CC) -o csim main.o
 
-main.o: main.cpp
+main.o: main.cpp csim_functions.h
 	$(CC) -c main.cpp $(CFLAGS)
 
 
