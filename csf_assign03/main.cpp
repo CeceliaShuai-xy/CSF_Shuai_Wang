@@ -1,13 +1,9 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-<<<<<<< HEAD
 #include <exception>
 #include "csim_functions.h"
-=======
 #include <sstream>
->>>>>>> 5c8933ef3e72d49d49a252c8e5a7dab4c8db8aee
-
 using std::cout;
 using std::endl;
 using std::cin;
@@ -15,12 +11,9 @@ using std::cerr;
 using std::getline;
 using std::string;
 using std::atoi;
-<<<<<<< HEAD
 using std::stoi;
 using std::exception;
-=======
 using std::stringstream;
->>>>>>> 5c8933ef3e72d49d49a252c8e5a7dab4c8db8aee
 
 int main(int argc, char* argv[]) {
 
@@ -28,21 +21,21 @@ int main(int argc, char* argv[]) {
         cerr << "Error: invalid number of command line arguments." << endl;
         return 1;
     }
-    Input_parm input_parm;
+    Input_param input_param;
 
     try {
-        input_parm.num_sets = stoi(argv[1]);
-        input_parm.num_blocks = stoi(argv[2]);
-        input_parm.num_bytes = stoi(argv[3]);
-        input_parm.allocate = argv[4];
-        input_parm.write_command = argv[5];
-        input_parm.evictions = argv[6];
+        input_param.num_sets = stoi(argv[1]);
+        input_param.num_blocks = stoi(argv[2]);
+        input_param.num_bytes = stoi(argv[3]);
+        input_param.allocate = argv[4];
+        input_param.write_command = argv[5];
+        input_param.evictions = argv[6];
     } catch (exception &ex) {
         cerr << "Error: command line arguments conversion failure." << endl;
     }
 
     try {
-    checkValidAuguments(input_param)
+        checkValidAuguments(input_param);
     } catch (exception &ex) {
         // print error message
         return 1;
@@ -65,7 +58,7 @@ int main(int argc, char* argv[]) {
     //     return 3;
     // }
 
-<<<<<<< HEAD
+
     // if ((n_byte < 4) || (n_byte % 2 != 0)) {
     //     cerr << "invalid number of bytes." << endl;
     //     return 4;
@@ -101,9 +94,6 @@ int main(int argc, char* argv[]) {
     //     }
     //     count++;
     // }
-=======
-    cout << n_set << " " << n_block << " " << n_byte << endl;
-    cout << allocate << " " << write_command << " " << evictions << endl;
 
     string n; 
     uint32_t address;
@@ -120,7 +110,6 @@ int main(int argc, char* argv[]) {
         // cout << "l or w: " << load_write << endl;
         // cout << "memory addr: " << hex_num << endl;
     }
->>>>>>> 5c8933ef3e72d49d49a252c8e5a7dab4c8db8aee
 
 
     return 0;

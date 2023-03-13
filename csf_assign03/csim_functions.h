@@ -37,7 +37,7 @@ typedef struct {
     string allocate;
     string write_command;
     string evictions; 
-}Input_parm;
+}Input_param;
 
 typedef struct {
     uint32_t total_loads;
@@ -51,15 +51,15 @@ typedef struct {
 
 // check if input_param is valid
 // throw std::invalid_argument() if augments is invalid
-void checkValidAuguments(Input_parm input_parm);
+void checkValidAuguments(Input_param input_param);
 
-Cache initialization_cache(Input_parm input_parm);
+Cache initialization_cache(Input_param input_param);
 
 Stats initialization_stats();
 
 uint32_t log2(uint32_t number);
 
-uint32_t findTag(unit32_t address, uint32_t index_pos);
+uint32_t findTag(uint32_t address, uint32_t index_pos);
 
 uint32_t findIndex(uint32_t address, uint32_t offset_pos);
 
