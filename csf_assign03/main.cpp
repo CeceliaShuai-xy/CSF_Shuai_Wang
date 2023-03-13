@@ -68,6 +68,10 @@ int main(int argc, char* argv[]) {
         ss >> load_write;
         ss >> memory;
         hex_num = std::stoul(memory, 0, 16);
+
+        // cout << "This is a new line" << endl;
+        // cout << "l or w: " << load_write << endl;
+        // cout << "memory addr: " << hex_num << endl;
     }
 
 
