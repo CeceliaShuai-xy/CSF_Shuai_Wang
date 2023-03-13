@@ -1,8 +1,12 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+<<<<<<< HEAD
 #include <exception>
 #include "csim_functions.h"
+=======
+#include <sstream>
+>>>>>>> 5c8933ef3e72d49d49a252c8e5a7dab4c8db8aee
 
 using std::cout;
 using std::endl;
@@ -11,8 +15,12 @@ using std::cerr;
 using std::getline;
 using std::string;
 using std::atoi;
+<<<<<<< HEAD
 using std::stoi;
 using std::exception;
+=======
+using std::stringstream;
+>>>>>>> 5c8933ef3e72d49d49a252c8e5a7dab4c8db8aee
 
 int main(int argc, char* argv[]) {
 
@@ -57,6 +65,7 @@ int main(int argc, char* argv[]) {
     //     return 3;
     // }
 
+<<<<<<< HEAD
     // if ((n_byte < 4) || (n_byte % 2 != 0)) {
     //     cerr << "invalid number of bytes." << endl;
     //     return 4;
@@ -92,6 +101,22 @@ int main(int argc, char* argv[]) {
     //     }
     //     count++;
     // }
+=======
+    cout << n_set << " " << n_block << " " << n_byte << endl;
+    cout << allocate << " " << write_command << " " << evictions << endl;
+
+    string n; 
+    int hex_num;
+    string load_write;
+    string memory;
+
+    while (getline(cin,n)) {
+        stringstream ss(n);
+        ss >> load_write;
+        ss >> memory;
+        hex_num = std::stoul(memory, 0, 16);
+    }
+>>>>>>> 5c8933ef3e72d49d49a252c8e5a7dab4c8db8aee
 
 
     return 0;
