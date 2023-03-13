@@ -23,7 +23,20 @@ using std::stringstream;
 void checkValidAuguments(Input_param input_param);
 
 //Gigi
-Cache initialization_cache(Input_param input_param);
+Cache initialization_cache(Input_param input_param) {
+    Slot slot = {0, false, 0, 0, false}
+    Cache cache;
+    Set set;
+    for (uint32_t i = 0; i < input_param.num_blocks; i++) {
+        set.slots.push_back(slot);
+    }
+    for (uint32_t i = 0; i < input_param.num_sets; i++) {
+        cache.sets.push_back(set);
+    }
+    cache.current_max = 0;
+
+    return cache;
+}
 
 //Cecilla
 Stats initialization_stats();
@@ -31,7 +44,9 @@ Stats initialization_stats();
 uint32_t log2(uint32_t number);
 
 //Gigi
-uint32_t findTag(uint32_t address, uint32_t index_pos);
+uint32_t findTag(uint32_t address, uint32_t index_pos) {
+    
+}
 
 //Cecilla
 uint32_t findIndex(uint32_t address, uint32_t offset_pos);
