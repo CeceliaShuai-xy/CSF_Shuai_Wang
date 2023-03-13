@@ -28,6 +28,7 @@ typedef struct {
 
 typedef struct {
     vector<Set> sets;
+    uint32_t current_max;
 }Cache;
 
 typedef struct {
@@ -53,15 +54,28 @@ typedef struct {
 // throw std::invalid_argument() if augments is invalid
 void checkValidAuguments(Input_param input_param);
 
+//Gigi
 Cache initialization_cache(Input_param input_param);
 
+//Cecilla
 Stats initialization_stats();
 
 uint32_t log2(uint32_t number);
 
+//Gigi
 uint32_t findTag(uint32_t address, uint32_t index_pos);
 
+//Cecilla
 uint32_t findIndex(uint32_t address, uint32_t offset_pos);
+
+bool isHit(uint32_t tag, uint32_t index, Cache cache);
+
+void updateLRU(uint32_t tag, uint32_t index, Cache *cache);
+
+// initalize map (tag to slot)
+void putNewSlot(uint32_t tag, uint32_t index, const Input_param input, Cache *cache, Stats stats);
+
+
 
 
 #endif

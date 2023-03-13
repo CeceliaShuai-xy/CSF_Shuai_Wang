@@ -111,6 +111,45 @@ int main(int argc, char* argv[]) {
         // cout << "memory addr: " << hex_num << endl;
     }
 
+/*
+current_max = 0
+while (user input) {
+    
+    tag = findTag
+    index = findIndex
+    if load:
+        if hit:
+            if lru:
+                update access_ts
+            total_cycle ++;
+        not hit:
+            if has invalid:
+                put slot in
+            if no invalid:
+                replace according lru/fifo
+    if save:
+        if hit:
+            if lru:
+                update access_ts
+            if write_throght:
+                total_cycle 101
+            if write_back:
+                dirty block
+                total_cycle ++
+        not hit:
+            if write-allocate:
+                if has invalid:
+                    put slot in
+                if no invalid:
+                    replace according lru/fifo
+            if no write allocate:
+                total_cycle 100
+
+    cache.current_max ++;
+}
+
+
+*/
 
     return 0;
 
