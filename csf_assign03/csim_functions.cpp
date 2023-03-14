@@ -69,7 +69,7 @@ uint32_t findIndex(uint32_t address, uint32_t offset_pos, uint32_t index_pos) {
     return (((1 << (index_pos - offset_pos)) - 1) & (address >> offset_pos));
 }
 
-
+// change cache to pointers ? 
 bool isHit(uint32_t tag, uint32_t index, Cache cache) {
     Set set = cache.sets.at(index);
     std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.find(tag);
@@ -152,8 +152,9 @@ void putNewSlot(uint32_t tag, uint32_t index, Input_param input, Cache *cache, S
         if (original_slot->dirty) {
             stats->total_cycles+=(100 * (input.num_bytes) / 4);
         }
+        set->tagToSlot.erase(original_slot->tag);
         *original_slot = {tag, true, cache->current_max, cache->current_max,false};
-            
+        set->tagToSlot.insert({tag,original_slot});
     }
 }
 
