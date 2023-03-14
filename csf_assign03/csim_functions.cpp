@@ -70,16 +70,17 @@ uint32_t findIndex(uint32_t address, uint32_t offset_pos, uint32_t index_pos) {
 }
 
 // change cache to pointers ? 
-bool isHit(uint32_t tag, uint32_t index, Cache cache) {
-    Set set = cache.sets.at(index);
+bool isHit(uint32_t tag, uint32_t index, Cache* cache) {
+    Set set = cache->sets.at(index);
     std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.find(tag);
     return !(it == set.tagToSlot.end());
 }
 
-void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param input) {
+void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param* input_param) {
     // check hit
+    Input_param input = *input_param;
     stats->total_loads++;
-    if (isHit(tag, index, *cache)) {
+    if (isHit(tag, index, cache)) {
         stats->load_hits++;
         stats->total_cycles++;
         if (input.evictions == "lru") {
@@ -88,15 +89,16 @@ void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
     } else {
         stats->total_cycles += (100 * (input.num_bytes) / 4);
         stats->load_misses++;
-        putNewSlot(tag, index, input, cache, stats);
+        putNewSlot(tag, index, input_param, cache, stats);
     }
 }
 
 
-void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param input){
+void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param* input_param){
     // check hit
+    Input_param input = *input_param;
     stats->total_stores++;
-    if (isHit(tag, index, *cache)) {
+    if (isHit(tag, index, cache)) {
         stats->store_hits++;
         if (input.evictions == "lru") {
             updateLRU(tag, index, cache);
@@ -111,7 +113,7 @@ void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
         stats->store_misses++;
         if (input.allocate == "write-allocate") {
             stats->total_cycles += (100 * (input.num_bytes) / 4) + 1;
-            putNewSlot(tag, index, input, cache, stats);
+            putNewSlot(tag, index, input_param, cache, stats);
         } else {
             stats->total_cycles += 100;
         }
@@ -129,13 +131,14 @@ void updateLRU(uint32_t tag, uint32_t index, Cache *cache) {
 }
 
 // initalize map (tag to slot)
-void putNewSlot(uint32_t tag, uint32_t index, Input_param input, Cache *cache, Stats* stats) {
+void putNewSlot(uint32_t tag, uint32_t index, Input_param* input_param, Cache *cache, Stats* stats) {
     // check if there's invalid slots
+    Input_param input = *input_param;
     Set* set = &cache->sets.at(index);
     std::map<uint32_t, Slot *>::iterator it;
     Slot* original_slot;
 
-    if (has_empty(*set)) {
+    if (has_empty(set)) {
         // find invalid spot 
         original_slot = find_invalid(set);
         *original_slot = {tag, true, cache->current_max, cache->current_max, false};
@@ -158,8 +161,8 @@ void putNewSlot(uint32_t tag, uint32_t index, Input_param input, Cache *cache, S
     }
 }
 
-bool has_empty(Set set) {
-    return set.tagToSlot.size() < set.slots.size();
+bool has_empty(Set* set) {
+    return set->tagToSlot.size() < set->slots.size();
 }
 
 Slot* find_invalid(Set* set) {

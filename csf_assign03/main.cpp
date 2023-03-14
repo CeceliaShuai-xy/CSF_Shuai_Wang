@@ -112,9 +112,9 @@ int main(int argc, char* argv[]) {
 
         // check load/write 
         if (load_write == "l") {
-            load_cache(&cache, tag, index, &stats, input_param);
+            load_cache(&cache, tag, index, &stats, &input_param);
         } else {
-            save_cache(&cache, tag, index, &stats, input_param);
+            save_cache(&cache, tag, index, &stats, &input_param);
         }
         cache.current_max++;
     }
