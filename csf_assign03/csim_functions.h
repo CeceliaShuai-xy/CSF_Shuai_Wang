@@ -66,16 +66,29 @@ uint32_t log2(uint32_t number);
 uint32_t findTag(uint32_t address, uint32_t index_pos);
 
 //Cecilla
-uint32_t findIndex(uint32_t address, uint32_t offset_pos);
+uint32_t findIndex(uint32_t address, uint32_t offset_pos, uint32_t index_pos);
 
 bool isHit(uint32_t tag, uint32_t index, Cache cache);
 
 void updateLRU(uint32_t tag, uint32_t index, Cache *cache);
 
 // initalize map (tag to slot)
-void putNewSlot(uint32_t tag, uint32_t index, const Input_param input, Cache *cache, Stats stats);
+void putNewSlot(uint32_t tag, uint32_t index, Input_param input, Cache *cache, Stats* stats);
 
+void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param input);
 
+void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param input);
 
+void mark_dirty(Cache* cache, uint32_t tag, uint32_t index);
+
+bool has_empty(Set set);
+
+Slot* find_invalid(Set* set);
+
+Slot* eviction_lru(Set set);
+
+Slot* eviction_fifo(Set set);
+
+void printStats(Stats stats);
 
 #endif

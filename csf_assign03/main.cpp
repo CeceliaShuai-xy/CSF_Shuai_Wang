@@ -106,9 +106,17 @@ int main(int argc, char* argv[]) {
         ss >> memory;
         address = std::stoul(memory, 0, 16);
 
-        // cout << "This is a new line" << endl;
-        // cout << "l or w: " << load_write << endl;
-        // cout << "memory addr: " << hex_num << endl;
+        // get tag and index
+        uint32_t tag = findTag(address, index_pos);
+        uint32_t index = findIndex(address, offset_pos, index_pos);
+
+        // check load/write 
+        if (load_write == "l") {
+            load_cache(&cache, tag, index, &stats, input_param);
+        } else {
+            save_cache(&cache, tag, index, &stats, input_param);
+        }
+        cache.current_max++;
     }
 
 /*
@@ -150,8 +158,6 @@ while (user input) {
 
 
 */
-
+    printStats(stats);
     return 0;
-
-    
 }
