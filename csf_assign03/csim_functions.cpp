@@ -76,15 +76,24 @@ bool isHit(uint32_t tag, uint32_t index, Cache* cache) {
     return !(it == set.tagToSlot.end());
 }
 
+std::map<uint32_t, Slot *>::iterator findSlot(uint32_t tag, uint32_t index, Cache* cache) {
+    Set set = cache->sets.at(index);
+    std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.find(tag);
+    return it;
+}
+
+
 void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param* input_param) {
     // check hit
     Input_param input = *input_param;
     stats->total_loads++;
-    if (isHit(tag, index, cache)) {
+    std::map<uint32_t, Slot *>::iterator it = findSlot(tag, index, cache);
+    if (it != cache->sets.at(index).tagToSlot.end()) {
         stats->load_hits++;
         stats->total_cycles++;
         if (input.evictions == "lru") {
-            updateLRU(tag, index, cache);
+            //updateLRU(tag, index, cache);
+            it->second->access_ts = cache->current_max;
         } 
     } else {
         stats->total_cycles += (100 * (input.num_bytes) / 4);
@@ -98,15 +107,18 @@ void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
     // check hit
     Input_param input = *input_param;
     stats->total_stores++;
-    if (isHit(tag, index, cache)) {
+    std::map<uint32_t, Slot *>::iterator it = findSlot(tag, index, cache);
+    if (it != cache->sets.at(index).tagToSlot.end()) {
         stats->store_hits++;
         if (input.evictions == "lru") {
-            updateLRU(tag, index, cache);
+            //updateLRU(tag, index, cache);
+            it->second->access_ts = cache->current_max;
         } 
         if (input.write_command == "write-through") {
             stats->total_cycles += 100 + 1;
         } else {
-            mark_dirty(cache, tag, index);
+            // mark_dirty(cache, tag, index);
+            it->second->dirty = true;
             stats->total_cycles++;
         }
     } else {

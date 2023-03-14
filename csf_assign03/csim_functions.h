@@ -91,4 +91,6 @@ Slot* eviction_fifo(Set set);
 
 void printStats(Stats stats);
 
+std::map<uint32_t, Slot *>::iterator findSlot(uint32_t tag, uint32_t index, Cache* cache);
+
 #endif
