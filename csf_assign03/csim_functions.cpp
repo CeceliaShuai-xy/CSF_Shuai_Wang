@@ -24,7 +24,7 @@ void checkValidAuguments(Input_param input_param);
 
 //Gigi
 Cache initialization_cache(Input_param input_param) {
-    Slot slot = {0, false, 0, 0, false}
+    Slot slot = {0, false, 0, 0, false};
     Cache cache;
     Set set;
     for (uint32_t i = 0; i < input_param.num_blocks; i++) {
@@ -41,11 +41,13 @@ Cache initialization_cache(Input_param input_param) {
 //Cecilla
 Stats initialization_stats();
 
-uint32_t log2(uint32_t number);
+uint32_t log2(uint32_t number) {
+
+}
 
 //Gigi
 uint32_t findTag(uint32_t address, uint32_t index_pos) {
-    
+    return address >> index_pos; 
 }
 
 //Cecilla
