@@ -55,7 +55,7 @@ uint32_t log2(uint32_t number) {
 
 //Gigi
 uint32_t findTag(uint32_t address, uint32_t index_pos) {
-    
+    return address >> index_pos; 
 }
 
 //Cecelia
