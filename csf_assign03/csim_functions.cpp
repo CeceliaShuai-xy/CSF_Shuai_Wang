@@ -87,8 +87,10 @@ void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
     // check hit
     Input_param input = *input_param;
     stats->total_loads++;
-    std::map<uint32_t, Slot *>::iterator it = findSlot(tag, index, cache);
-    if (it != cache->sets.at(index).tagToSlot.end()) {
+    Set set = cache->sets.at(index);
+    std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.find(tag);
+    // std::map<uint32_t, Slot *>::iterator it = findSlot(tag, index, cache);
+    if (it != set.tagToSlot.end()) {
         stats->load_hits++;
         stats->total_cycles++;
         if (input.evictions == "lru") {
@@ -107,8 +109,9 @@ void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
     // check hit
     Input_param input = *input_param;
     stats->total_stores++;
-    std::map<uint32_t, Slot *>::iterator it = findSlot(tag, index, cache);
-    if (it != cache->sets.at(index).tagToSlot.end()) {
+    Set set = cache->sets.at(index);
+    std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.find(tag);
+    if (it != set.tagToSlot.end()) {
         stats->store_hits++;
         if (input.evictions == "lru") {
             //updateLRU(tag, index, cache);
