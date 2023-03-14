@@ -24,7 +24,7 @@ void checkValidAuguments(Input_param input_param);
 
 //Gigi
 Cache initialization_cache(Input_param input_param) {
-    Slot slot = {0, false, 0, 0, false}
+    Slot slot = {0, false, 0, 0, false};
     Cache cache;
     Set set;
     for (uint32_t i = 0; i < input_param.num_blocks; i++) {
@@ -38,18 +38,31 @@ Cache initialization_cache(Input_param input_param) {
     return cache;
 }
 
-//Cecilla
-Stats initialization_stats();
+//Cecelia
+Stats initialization_stats() {
+    Stats stats = {0,0,0,0,0,0,0};
+    return stats;
+}
 
-uint32_t log2(uint32_t number);
+uint32_t log2(uint32_t number) {
+    uint32_t temp = 0;
+    while (number != 1){
+        number = number >> 1;
+        temp ++;
+    }
+    return temp;
+}
 
 //Gigi
 uint32_t findTag(uint32_t address, uint32_t index_pos) {
     
 }
 
-//Cecilla
-uint32_t findIndex(uint32_t address, uint32_t offset_pos);
+//Cecelia
+uint32_t findIndex(uint32_t address, uint32_t offset_pos, uint32_t index_pos) {
+    return (address >> offset_pos) & (0xFFFFFFFF >> (32 - index_pos));
+}
+
 
 bool isHit(uint32_t tag, uint32_t index, Cache cache);
 
