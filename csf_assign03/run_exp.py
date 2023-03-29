@@ -1,13 +1,12 @@
-from cProfile import run
 import os
 import itertools
 
 
 # below are parameters to vary:
 
-sets_size = [1, 1024]
-block_size = [1, 4, 1024]
-bytes_size = [16]
+sets_size = [1, 1024, 32]
+block_size = [1, 1024, 32]
+bytes_size = [512]
 write = ["write-allocate write-back", "no-write-allocate write-through"]
 eviction = ["lru", "fifo"]
 
