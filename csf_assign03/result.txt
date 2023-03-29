@@ -1,48 +1,92 @@
 Experiment 1
-./csim 1 256 16 write-allocate write-back lru < trace/gcc.trace
+./csim 1 1 16 write-allocate write-back lru < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 313123
-Load misses: 5074
-Store hits: 187653
-Store misses: 9833
-Total cycles: 10580209
+Load hits: 69728
+Load misses: 248469
+Store hits: 64520
+Store misses: 132966
+Total cycles: 173585214
 
 
 Experiment 2
-./csim 1 256 16 write-allocate write-back fifo < trace/gcc.trace
+./csim 1 1 16 write-allocate write-back fifo < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 311025
-Load misses: 7172
-Store hits: 186977
-Store misses: 10509
-Total cycles: 12229311
+Load hits: 69728
+Load misses: 248469
+Store hits: 64520
+Store misses: 132966
+Total cycles: 173585214
 
 
 Experiment 3
-./csim 1 256 16 no-write-allocate write-through lru < trace/gcc.trace
+./csim 1 1 16 no-write-allocate write-through lru < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 309777
-Load misses: 8420
-Store hits: 163612
-Store misses: 33874
-Total cycles: 23589989
+Load hits: 69375
+Load misses: 248822
+Store hits: 22390
+Store misses: 175096
+Total cycles: 119369165
 
 
 Experiment 4
-./csim 1 256 16 no-write-allocate write-through fifo < trace/gcc.trace
+./csim 1 1 16 no-write-allocate write-through fifo < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 307970
-Load misses: 10227
-Store hits: 161070
-Store misses: 36416
-Total cycles: 24308440
+Load hits: 69375
+Load misses: 248822
+Store hits: 22390
+Store misses: 175096
+Total cycles: 119369165
 
 
 Experiment 5
+./csim 1 4 16 write-allocate write-back lru < trace/gcc.trace
+Total loads: 318197
+Total stores: 197486
+Load hits: 120364
+Load misses: 197833
+Store hits: 101401
+Store misses: 96085
+Total cycles: 146693050
+
+
+Experiment 6
+./csim 1 4 16 write-allocate write-back fifo < trace/gcc.trace
+Total loads: 318197
+Total stores: 197486
+Load hits: 118260
+Load misses: 199937
+Store hits: 100341
+Store misses: 97145
+Total cycles: 148538946
+
+
+Experiment 7
+./csim 1 4 16 no-write-allocate write-through lru < trace/gcc.trace
+Total loads: 318197
+Total stores: 197486
+Load hits: 118340
+Load misses: 199857
+Store hits: 52112
+Store misses: 145374
+Total cycles: 99861852
+
+
+Experiment 8
+./csim 1 4 16 no-write-allocate write-through fifo < trace/gcc.trace
+Total loads: 318197
+Total stores: 197486
+Load hits: 118312
+Load misses: 199885
+Store hits: 51158
+Store misses: 146328
+Total cycles: 99872070
+
+
+Experiment 9
 ./csim 1 1024 16 write-allocate write-back lru < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
@@ -53,7 +97,7 @@ Store misses: 9186
 Total cycles: 9074459
 
 
-Experiment 6
+Experiment 10
 ./csim 1 1024 16 write-allocate write-back fifo < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
@@ -64,7 +108,7 @@ Store misses: 9369
 Total cycles: 9582197
 
 
-Experiment 7
+Experiment 11
 ./csim 1 1024 16 no-write-allocate write-through lru < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
@@ -75,7 +119,7 @@ Store misses: 32708
 Total cycles: 22814701
 
 
-Experiment 8
+Experiment 12
 ./csim 1 1024 16 no-write-allocate write-through fifo < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
@@ -86,136 +130,92 @@ Store misses: 33290
 Total cycles: 23038756
 
 
-Experiment 9
-./csim 4 256 16 write-allocate write-back lru < trace/gcc.trace
-Total loads: 318197
-Total stores: 197486
-Load hits: 314963
-Load misses: 3234
-Store hits: 188305
-Store misses: 9181
-Total cycles: 9076849
-
-
-Experiment 10
-./csim 4 256 16 write-allocate write-back fifo < trace/gcc.trace
-Total loads: 318197
-Total stores: 197486
-Load hits: 314314
-Load misses: 3883
-Store hits: 188115
-Store misses: 9371
-Total cycles: 9578200
-
-
-Experiment 11
-./csim 4 256 16 no-write-allocate write-through lru < trace/gcc.trace
-Total loads: 318197
-Total stores: 197486
-Load hits: 311730
-Load misses: 6467
-Store hits: 164776
-Store misses: 32710
-Total cycles: 22811906
-
-
-Experiment 12
-./csim 4 256 16 no-write-allocate write-through fifo < trace/gcc.trace
-Total loads: 318197
-Total stores: 197486
-Load hits: 311165
-Load misses: 7032
-Store hits: 164241
-Store misses: 33245
-Total cycles: 23036806
-
-
 Experiment 13
-./csim 4 1024 16 write-allocate write-back lru < trace/gcc.trace
+./csim 1024 1 16 write-allocate write-back lru < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 315561
-Load misses: 2636
-Store hits: 188572
-Store misses: 8914
-Total cycles: 7579847
+Load hits: 312238
+Load misses: 5959
+Store hits: 187502
+Store misses: 9984
+Total cycles: 10894524
 
 
 Experiment 14
-./csim 4 1024 16 write-allocate write-back fifo < trace/gcc.trace
+./csim 1024 1 16 write-allocate write-back fifo < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 315407
-Load misses: 2790
-Store hits: 188518
-Store misses: 8968
-Total cycles: 7711693
+Load hits: 312238
+Load misses: 5959
+Store hits: 187502
+Store misses: 9984
+Total cycles: 10894524
 
 
 Experiment 15
-./csim 4 1024 16 no-write-allocate write-through lru < trace/gcc.trace
+./csim 1024 1 16 no-write-allocate write-through lru < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 312155
-Load misses: 6042
-Store hits: 165211
-Store misses: 32275
-Total cycles: 22642766
+Load hits: 309108
+Load misses: 9089
+Store hits: 162581
+Store misses: 34905
+Total cycles: 23855889
 
 
 Experiment 16
-./csim 4 1024 16 no-write-allocate write-through fifo < trace/gcc.trace
+./csim 1024 1 16 no-write-allocate write-through fifo < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 312018
-Load misses: 6179
-Store hits: 165145
-Store misses: 32341
-Total cycles: 22697363
+Load hits: 309108
+Load misses: 9089
+Store hits: 162581
+Store misses: 34905
+Total cycles: 23855889
 
 
 Experiment 17
-./csim 1024 256 16 write-allocate write-back lru < trace/gcc.trace
+./csim 1024 4 16 write-allocate write-back lru < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 315855
-Load misses: 2342
-Store hits: 188617
-Store misses: 8869
-Total cycles: 4997741
+Load hits: 315505
+Load misses: 2692
+Store hits: 188561
+Store misses: 8925
+Total cycles: 7558191
 
 
 Experiment 18
-./csim 1024 256 16 write-allocate write-back fifo < trace/gcc.trace
+./csim 1024 4 16 write-allocate write-back fifo < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 315855
-Load misses: 2342
-Store hits: 188617
-Store misses: 8869
-Total cycles: 4997741
+Load hits: 315334
+Load misses: 2863
+Store hits: 188499
+Store misses: 8987
+Total cycles: 7708820
 
 
 Experiment 19
-./csim 1024 256 16 no-write-allocate write-through lru < trace/gcc.trace
+./csim 1024 4 16 no-write-allocate write-through lru < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 312207
-Load misses: 5990
-Store hits: 165216
-Store misses: 32270
-Total cycles: 22622023
+Load hits: 312125
+Load misses: 6072
+Store hits: 165202
+Store misses: 32284
+Total cycles: 22654727
 
 
 Experiment 20
-./csim 1024 256 16 no-write-allocate write-through fifo < trace/gcc.trace
+./csim 1024 4 16 no-write-allocate write-through fifo < trace/gcc.trace
 Total loads: 318197
 Total stores: 197486
-Load hits: 312207
-Load misses: 5990
-Store hits: 165216
-Store misses: 32270
-Total cycles: 22622023
+Load hits: 311974
+Load misses: 6223
+Store hits: 164849
+Store misses: 32637
+Total cycles: 22714623
 
 
 Experiment 21
