@@ -9,7 +9,7 @@ Contribution:
     cleaned up the code and added the comments.
 _____________________________________________________________________________________________
 Report: 
-We ran 20 experiments using gcc.trace to try different configurations regading
+We ran 24 experiments using gcc.trace to try different configurations regading
 four different block sizes, two sets of parameter choices (NWA+WT, WA+WB), 
 two eviction designs and three cache organizations (direct-mapped, set associative,
 fully associative).
@@ -36,8 +36,9 @@ Specificaly, with the 512KB capacity, three organizations can be simulated by
 To separate the influences of cache organizations from the num_set and num_block, 
 we changed these two stats within the same cache organization (commeneted by /*...*/ in the table above).
 And on top of these organizations, we changed the NMA+WT vs. WA+WB and fifo vs. lru
-to see their influences on the cache performances. Hence, we ended up with 20 experiments 
-in total (5 x 2 x 2 = 20). And the detailed experimental results (statistics) are the following:
+to see their influences on the cache performances. Hence, we ended up with 24 experiments 
+in total (5 x 2 x 2 = 20 and four additional experiments specifically for num_blocks).
+And the detailed experimental results (statistics) are the following:
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 Experiments results: 
 Experiment 1
@@ -265,7 +266,7 @@ we can compare direct mapping (DM) vs. fully associative (FA) vs. set associativ
 comparing Exp 1 vs. Exp 9 vs. Exp 13, and,  Exp 2 vs. Exp 10 vs. Exp v14, etc.
 We observe that the DM resulted in higher load/store misses and much more cycles than FA anf SA,
 FA and SA have comparable load/store hits/misses and SA has the least number of total cycles.
-In this case, we consider SA to be a better organization than DM and FA at least for this experiment.
+In this case, we consider SA to be a better organization than DM and FA.
 
 2. If we only change the NMA+WT vs. WA+WB, we can compare Exp1 vs. Exp3, Exp 2 vs. Exp4, etc.,
 and we observe that NMA+WT resulted in higher load misses, significantly higher store misses
@@ -282,8 +283,8 @@ much higher total cycles. Therefore, we consider having larger num_set might be 
 5. If we only change the num_block, we can compare Exp 1 vs. Exp 5, Exp 2 vs. Exp 6, etc., 
 and we observe that higher num_block led to higher load/store misses but lower total 
 cycles.
-    Since this result is kind of ambiguous, we added a few additional experiments with num_set=32, 
-    different num_blocks and byte sizes to keep capacity the same (512K), and with lru, WA+WB.
+    We also added a few additional experiments with num_set=32, different num_blocks and byte sizes
+    to keep capacity the same (512K), and with lru, WA+WB.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -
     Here are the experiments:
     Experiment 21:
@@ -307,16 +308,6 @@ cycles.
     Total cycles: 15030607
 
     Experiment 23: 
-    ./csim 32 256 64 write-allocate write-back lru < trace/gcc.trace
-    Total loads: 318197
-    Total stores: 197486
-    Load hits: 317204
-    Load misses: 993
-    Store hits: 195112
-    Store misses: 2374
-    Total cycles: 5901890
-
-    Experiment 24:
     ./csim 32 1024 16 write-allocate write-back lru < trace/gcc.trace
     Total loads: 318197
     Total stores: 197486
@@ -325,14 +316,35 @@ cycles.
     Store hits: 188617
     Store misses: 8869
     Total cycles: 4997741
+
+    Experiment 24:
+    ./csim 32 4096 4 write-allocate write-back lru < trace/gcc.trace
+    Total loads: 318197
+    Total stores: 197486
+    Load hits: 313766
+    Load misses: 4431
+    Store hits: 170130
+    Store misses: 27356
+    Total cycles: 3689952
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -
 And we could observe that from Exp 21 to 24, as the num_block is increasing, the number of total
-cycles drops significantly, but load/store misses also increases significantly, maintaining the 
-same trend as previous experiments show. Therefore, we conclude that higher number of blocks leads 
-to lower total cycles, higher load/store misses. The best plan, therefore, is to choose an intermediate
-number (not too high or too low) so that we can maintain a reasonable amount of load hits and store hits, 
-while also decreasing the total cycles to some extent. 
+cycles drops significantly, and load/store misses increases. 
+Therefore, we conclude that higher number of blocks leads to lower total cycles, higher load/store misses.
+Since our goal is to decrease the total number of cycles, a higher num_block is more desirable.
 
+Conclusion:
 Since we are looking for the best cache configuration, we want higher hit rate (lower number 
-of misses), and fewer cycles and miss penalties. And from our experiments, we can conclude that
-set associative organization, WA+WB, lru and an intermediate number of num_block are more desirable. 
+of misses), and fewer cycles. And from our experiments, we can conclude that
+set-associative organization, WA+WB, lru, and a large num_block would have the best overall cache
+effectiveness. 
+The specific set of configutation is experiment 24: 
+num_set = 32, num_block = 4096, byte_size = 4, write-allocate, write-back, lru, and its stats are:
+    Total loads: 318197
+    Total stores: 197486
+    Load hits: 313766
+    Load misses: 4431
+    Store hits: 170130
+    Store misses: 27356
+    Total cycles: 3689952
+It achieved the lowest number of total cycles out of all experiments. And further increasing the numb_block 
+(and decreasing the num_set so capacity stays the same) no longer improves the total cycles.
