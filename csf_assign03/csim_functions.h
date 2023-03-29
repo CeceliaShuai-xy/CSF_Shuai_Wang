@@ -1,3 +1,12 @@
+/*
+ * cpp helper functions to implement cache
+ * CSF Assignment 3 
+ * Cecelia Shuai 
+ * xshuai3@jh.edu
+ * Gigi Wang 
+ * ywang580@jhu.edu
+ */
+
 #ifndef CSIM_FUNCTIONS_H
 #define CSIM_FUNCTIONS_H
 
@@ -50,8 +59,6 @@ typedef struct {
     uint32_t total_cycles;
 }Stats;
 
-// check if input_param is valid
-// throw std::invalid_argument() if augments is invalid
 void checkValidAuguments(Input_param* input_param);
 
 void check_valid_num(Input_param* input_param);
@@ -59,32 +66,25 @@ void check_valid_num(Input_param* input_param);
 
 void check_valid_string(Input_param* input_param);
 
-//Gigi
+bool is_power_of_2(uint32_t n);
+
 Cache initialization_cache(Input_param input_param);
 
-//Cecilla
 Stats initialization_stats();
 
 uint32_t log2(uint32_t number);
 
-//Gigi
 uint32_t findTag(uint32_t address, uint32_t index_pos);
 
-//Cecilla
 uint32_t findIndex(uint32_t address, uint32_t offset_pos, uint32_t index_pos);
 
 bool isHit(uint32_t tag, uint32_t index, Cache* cache);
 
-void updateLRU(uint32_t tag, uint32_t index, Cache *cache);
-
-// initalize map (tag to slot)
 void putNewSlot(uint32_t tag, uint32_t index, Input_param* input_param, Cache *cache, Stats* stats);
 
 void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param* input_param);
 
 void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param* input_param);
-
-void mark_dirty(Cache* cache, uint32_t tag, uint32_t index);
 
 bool has_empty(Set* set);
 
@@ -95,7 +95,5 @@ Slot* eviction_lru(Set* set);
 Slot* eviction_fifo(Set* set);
 
 void printStats(Stats stats);
-
-std::map<uint32_t, Slot *>::iterator findSlot(uint32_t tag, uint32_t index, Cache* cache);
 
 #endif
