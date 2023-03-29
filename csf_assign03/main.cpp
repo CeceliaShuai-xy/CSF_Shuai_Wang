@@ -1,9 +1,19 @@
+/*
+ * Main function to simulate cache on a variety of traces
+ * CSF Assignment 3 
+ * Cecelia Shuai 
+ * xshuai3@jh.edu
+ * Gigi Wang 
+ * ywang580@jhu.edu
+*/
+
 #include <iostream>
 #include <string>
 #include <cstdlib>
 #include <exception>
 #include "csim_functions.h"
 #include <sstream>
+
 using std::cout;
 using std::endl;
 using std::cin;
@@ -15,6 +25,19 @@ using std::stoi;
 using std::exception;
 using std::stringstream;
 
+/*
+ * Main function to simulate cache based on the input params.
+ * Handle exceptions when the input arguments are invalid,
+ * and print stats regarding cache performance.
+ *
+ * Parameters:
+ *   arg - number of argument
+ *   argv - argument 
+ *
+ * Returns:
+ *   0 - when no error pops up
+ *   nonzero - otherwise
+ */
 int main(int argc, char* argv[]) {
 
     if (!(argc == 7)) {
@@ -32,13 +55,14 @@ int main(int argc, char* argv[]) {
         input_param.evictions = argv[6];
     } catch (exception &ex) {
         cerr << "Error: command line arguments conversion failure." << endl;
+        return 2;
     }
 
     try {
         checkValidAuguments(&input_param);
     } catch (exception &ex) {
         cerr << ex.what() << endl;
-        return 1;
+        return 3;
     }
     
     Cache cache = initialization_cache(input_param);
@@ -46,54 +70,6 @@ int main(int argc, char* argv[]) {
 
     uint32_t offset_pos = log2(input_param.num_bytes);
     uint32_t index_pos = log2(input_param.num_sets) + offset_pos;
-
-
-    // checking invalid cache parameters
-    // if ((n_set <= 0) || (n_set % 2 != 0)) {
-    //     cerr << "invalid number of sets." << endl;
-    //     return 2;
-    // }
-    // if ((n_block <= 0) || (n_block % 2 != 0)) {
-    //     cerr << "invalid number of blocks." << endl;
-    //     return 3;
-    // }
-
-
-    // if ((n_byte < 4) || (n_byte % 2 != 0)) {
-    //     cerr << "invalid number of bytes." << endl;
-    //     return 4;
-    // }
-
-    // if ((allocate != "write-allocate") && (allocate != "no-write-allocate")) {
-    //     cerr << "invalid allocation method." << endl;
-    //     return 5;
-    // }
-
-    // if ((write_command != "write-through") && (write_command != "write-back")) {
-    //     cerr << "invalid writing method." << endl;
-    //     return 6;
-    // }
-
-    // if ((evictions != "lru") && (evictions != "fifo")) {
-    //     cerr << "invalid evictions" << endl;
-    // }
-
-    // cout << n_set << " " << n_block << " " << n_byte << endl;
-    // cout << allocate << " " << write_command << " " << evictions << endl;
-
-    // string n; 
-    // int count = 0;
-    // int hex_num;
-    // while (cin >> n) {
-    //     if (count == 1) {
-    //         hex_num = std::stoul(n, 0, 16);
-    //     }
-    //     if (count == 2) {
-    //         count = 0;
-    //         continue;
-    //     }
-    //     count++;
-    // }
 
     string n; 
     uint32_t address;
@@ -119,6 +95,11 @@ int main(int argc, char* argv[]) {
         cache.current_max++;
     }
 
+    printStats(stats);
+    return 0;
+}
+
+// Pseudo code for implementation of cache
 /*
 current_max = 0
 while (user input) {
@@ -155,9 +136,4 @@ while (user input) {
 
     cache.current_max ++;
 }
-
-
 */
-    printStats(stats);
-    return 0;
-}

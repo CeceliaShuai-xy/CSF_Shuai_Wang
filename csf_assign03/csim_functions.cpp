@@ -1,3 +1,12 @@
+/*
+ * Cpp helper functions to implement cache
+ * CSF Assignment 3 
+ * Cecelia Shuai 
+ * xshuai3@jh.edu
+ * Gigi Wang 
+ * ywang580@jhu.edu
+ */
+
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -20,19 +29,34 @@ using std::map;
 using std::vector;
 using std::find;
 
-
-
-// check if input_param is valid
-// throw std::invalid_argument() if augments is invalid
+/*
+ * Check if input parameters are valid in terms of the number
+ * and strings. Throw std::invalid_argument() if augments
+ * are invalid.
+ * 
+ * Parameters:
+ *      input_param - a struct that stores all input arguments
+ * 
+ * Returns:
+ *      void
+ *  
+ */
 void checkValidAuguments(Input_param* input_param) {
     check_valid_num(input_param);
     check_valid_string(input_param);
 }
 
-bool is_power_of_2(uint32_t n) {
-    return (n > 0) && (n & (n - 1)) == 0;
-}
-
+/*
+ * Check if the numerical input are valid. Throw std::invalid_argument()
+ * if augments are invalid.
+ * 
+ * Parameters:
+ *      input_param - a struct that stores all input arguments
+ * 
+ * Returns:
+ *      void
+ *  
+ */
 void check_valid_num(Input_param* input_param) {
     if (!(is_power_of_2(input_param->num_sets) && is_power_of_2(input_param->num_blocks) && is_power_of_2(input_param->num_bytes))) {
         throw std::invalid_argument("Error: numbers are not power of 2.");
@@ -45,6 +69,33 @@ void check_valid_num(Input_param* input_param) {
     }
 }
 
+/*
+ * Helper function to check if input n is a power of 2.
+ * 
+ * Parameters:
+ *      n - the input number, number of sets, number of blocks 
+ * and number of bytes in this particular case
+ * 
+ * Returns:
+ *      true - if n is a power of 2
+ *      false - otherwise
+ *  
+ */
+bool is_power_of_2(uint32_t n) {
+    return (n > 0) && (n & (n - 1)) == 0;
+}
+
+/*
+ * Check if string inputs are valid. Throw std::invalid_argument()
+ * when they are not.
+ * 
+ * Parameters:
+ *      input_param - a struct that stores all input arguments
+ * 
+ * Returns:
+ *      void
+ *  
+ */
 void check_valid_string(Input_param* input_param) {
     if ((input_param->allocate != "write-allocate") && (input_param->allocate != "no-write-allocate")) {
         throw std::invalid_argument("Error: invalid allocation method");
@@ -60,7 +111,17 @@ void check_valid_string(Input_param* input_param) {
     }
 }
 
-//Gigi
+/*
+ * Initialize the cache with input parameters. 
+ * 
+ * 
+ * Parameters:
+ *      input_param - a struct that stores all input arguments
+ * 
+ * Returns:
+ *      cache - the initialized cache
+ *  
+ */
 Cache initialization_cache(Input_param input_param) {
     Slot slot = {0, false, 0, 0, false};
     Cache cache;
@@ -76,12 +137,33 @@ Cache initialization_cache(Input_param input_param) {
     return cache;
 }
 
-//Cecelia
+/*
+ * Initialize the cache stats to be all zeros.
+ * 
+ * 
+ * Parameters:
+ *      N/A
+ * 
+ * Returns:
+ *      stats - a struct that stores all the statistics
+ *  
+ */
 Stats initialization_stats() {
     Stats stats = {0,0,0,0,0,0,0};
     return stats;
 }
 
+/*
+ * Helper function to calculate the log2 of an integer.
+ * 
+ * 
+ * Parameters:
+ *      number - a uint32_t type number
+ * 
+ * Returns:
+ *      temp - the log2(number) result
+ *  
+ */
 uint32_t log2(uint32_t number) {
     uint32_t temp = 0;
     while (number != 1){
@@ -91,43 +173,87 @@ uint32_t log2(uint32_t number) {
     return temp;
 }
 
-//Gigi// change ?
+/*
+ * Calculate the tag.
+ * 
+ * 
+ * Parameters:
+ *     address - the memory address
+ *     index_pos - index position
+ * 
+ * Returns:
+ *      address >> index_pos (the calculated tag)
+ *  
+ */
 uint32_t findTag(uint32_t address, uint32_t index_pos) {
-    //return ((1<<(32 - index_pos)) - 1) & (address >> index_pos);
     return address >> index_pos;
 }
 
-//Cecelia
+/*
+ * Find the index using addressm offset_position and index position.
+ * 
+ * 
+ * Parameters:
+ *     address - the memory address
+ *     offset_pos - index of the 'offset'
+ *     index_pos - index of the 'index'
+ * 
+ * Returns:
+ *      the calculated index
+ *  
+ */
 uint32_t findIndex(uint32_t address, uint32_t offset_pos, uint32_t index_pos) {
     return (((1 << (index_pos - offset_pos)) - 1) & (address >> offset_pos));
 }
 
-// change cache to pointers ? 
+/*
+ * Check if tag can be found in the cache at certain index.
+ * 
+ * 
+ * Parameters:
+ *     tag - the tag
+ *     index - the index
+ *     cache - pointer to the cache
+ * 
+ * Returns:
+ *      true - when cache has found the slot with specified tag and index
+ *      false - otherwise
+ *  
+ */
 bool isHit(uint32_t tag, uint32_t index, Cache* cache) {
     Set set = cache->sets.at(index);
     std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.find(tag);
     return !(it == set.tagToSlot.end());
 }
 
-std::map<uint32_t, Slot *>::iterator findSlot(uint32_t tag, uint32_t index, Cache* cache) {
-    Set set = cache->sets.at(index);
-    std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.find(tag);
-    return it;
-}
-
-
+/*
+ * Load cache. Check hit first. Update the cache slot if there is 
+ * a miss (not hit). Update the cache statistics and access 
+ * timestamps accordingly.
+ * 
+ * 
+ * Parameters:
+ *     cache - poiner to the cache
+ *     tag - the tag
+ *     index - the index
+ *     stats - pointer to the struct that stores the cache statistics 
+ *     input-param - pointer to the struct that stores the input parameters
+ *     
+ * 
+ * Returns:
+ *      void
+ *  
+ */
 void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param* input_param) {
     // check hit
     Input_param input = *input_param;
     stats->total_loads++;
     Set *set = &(cache->sets.at(index));
     std::map<uint32_t, Slot *>::iterator it = set->tagToSlot.find(tag);
-    // std::map<uint32_t, Slot *>::iterator it = findSlot(tag, index, cache);
     if (it != set->tagToSlot.end()) {
         stats->load_hits++;
         stats->total_cycles++;
         if (input.evictions == "lru") {
-            //updateLRU(tag, index, cache);
             it->second->access_ts = cache->current_max;
         } 
     } else {
@@ -137,7 +263,24 @@ void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
     }
 }
 
-
+/*
+ * Save cache. Check hit first. If there is a miss, and the input
+ * parameter specifies wrtie-through, update the cache slot.
+ * And update the cache statistics and access timestamps accordingly.
+ * 
+ * 
+ * Parameters:
+ *     cache - pointer to the cache
+ *     tag - the tag
+ *     index - the index
+ *     stats - pointer to the struct that stores the cache statistics 
+ *     input-param - pointer to the struct that stores the input parameters
+ *     
+ * 
+ * Returns:
+ *      void
+ *  
+ */
 void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_param* input_param){
     // check hit
     Input_param input = *input_param;
@@ -147,13 +290,11 @@ void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
     if (it != set->tagToSlot.end()) {
         stats->store_hits++;
         if (input.evictions == "lru") {
-            //updateLRU(tag, index, cache);
             it->second->access_ts = cache->current_max;
         } 
         if (input.write_command == "write-through") {
             stats->total_cycles += 100 + 1;
         } else {
-            // mark_dirty(cache, tag, index);
             it->second->dirty = true;
             stats->total_cycles++;
         }
@@ -168,17 +309,24 @@ void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
     }
 }
 
-void mark_dirty(Cache* cache, uint32_t tag, uint32_t index) {
-    std::map<uint32_t, Slot *> map = cache->sets.at(index).tagToSlot;
-    map.at(tag)->dirty = true;
-}
-
-void updateLRU(uint32_t tag, uint32_t index, Cache *cache) {
-    std::map<uint32_t, Slot *> map = cache->sets.at(index).tagToSlot;
-    map.at(tag)->access_ts = cache->current_max;
-}
-
-// initalize map (tag to slot)
+/*
+ * Update the cache slot. Direclty insert the slot if there is invalid
+ * slot, else, erase one slot accoridng to the eviction rule and insert 
+ * the new slot with the tag. 
+ * 
+ * 
+ * Parameters:
+ *     tag - the tag
+ *     index - the index
+ *     input-param - pointer to the struct that stores the input parameters
+*      cache - pointer to the cache
+ *     stats - pointer to the struct that stores the cache statistics 
+ *     
+ * 
+ * Returns:
+ *      void
+ *  
+ */
 void putNewSlot(uint32_t tag, uint32_t index, Input_param* input_param, Cache *cache, Stats* stats) {
     // check if there's invalid slots
     Input_param input = *input_param;
@@ -209,10 +357,32 @@ void putNewSlot(uint32_t tag, uint32_t index, Input_param* input_param, Cache *c
     }
 }
 
+/*
+ * Helper function to check is the set is empty.
+ * 
+ * Parameters:
+ *     set - pointer to a struct that simulates the set
+ * 
+ * Returns:
+ *      true - if used set size is smaller than the capacity
+ *      false - otherwise
+ *  
+ */
 bool has_empty(Set* set) {
     return set->tagToSlot.size() < set->slots.size();
 }
 
+/*
+ * Helper function to check if there is invalid slot.
+ * 
+ * Parameters:
+ *     set - pointer to a struct that simulates the set
+ * 
+ * Returns:
+ *      address of the invalid slot
+ *      Null - if there is no invalid slot
+ *  
+ */
 Slot* find_invalid(Set* set) {
     for (vector<Slot>::iterator it = (set->slots).begin(); it != set->slots.end(); ++it) {
         if (it->valid == false) {
@@ -222,6 +392,17 @@ Slot* find_invalid(Set* set) {
     return NULL;
 }
 
+/*
+ * Evict the slot according to the LRU rule by finding the 
+ * slot with the smallest access timestamps.
+ * 
+ * Parameters:
+ *     set - pointer to a struct that simulates the set
+ * 
+ * Returns:
+ *      pointer to the slot with smallest access timestamps
+ *  
+ */
 Slot* eviction_lru(Set* set) {
     uint32_t min_ts = UINT32_MAX;
     std::map<uint32_t, Slot *>::iterator temp_it;
@@ -234,6 +415,17 @@ Slot* eviction_lru(Set* set) {
     return &(*temp_it->second);
 }
 
+/*
+ * Evict the slot according to the FIFO rule by finding the 
+ * slot with the smallest load timestamps.
+ * 
+ * Parameters:
+ *     set - pointer to a struct that simulates the set
+ * 
+ * Returns:
+ *      pointer to the slot with smallest load timestamps
+ *  
+ */
 Slot* eviction_fifo(Set* set) {
     uint32_t min_ts = UINT32_MAX;
     std::map<uint32_t, Slot *>::iterator temp_it;
@@ -246,6 +438,16 @@ Slot* eviction_fifo(Set* set) {
     return &(*temp_it->second);
 }
 
+/*
+ * Helper functions to print the cache stats.
+ * 
+ * Parameters:
+ *     stats - the struct that stores all the cache statistics
+ * 
+ * Returns:
+ *      void
+ *  
+ */
 void printStats(Stats stats) {
     cout << "Total loads: " << stats.total_loads << endl;
     cout << "Total stores: " << stats.total_stores << endl;
