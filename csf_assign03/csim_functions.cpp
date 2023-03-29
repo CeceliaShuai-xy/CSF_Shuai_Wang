@@ -24,8 +24,40 @@ using std::find;
 
 // check if input_param is valid
 // throw std::invalid_argument() if augments is invalid
-void checkValidAuguments(Input_param input_param) {
-    return;
+void checkValidAuguments(Input_param* input_param) {
+    check_valid_num(input_param);
+    check_valid_string(input_param);
+}
+
+bool is_power_of_2(uint32_t n) {
+    return (n > 0) && (n & (n - 1)) == 0;
+}
+
+void check_valid_num(Input_param* input_param) {
+    if (!(is_power_of_2(input_param->num_sets) && is_power_of_2(input_param->num_blocks) && is_power_of_2(input_param->num_bytes))) {
+        throw std::invalid_argument("Error: numbers are not power of 2.");
+    }
+    if (input_param->num_bytes < 4) {
+        throw std::invalid_argument("Error: number of bytes is less than 4.");
+    }
+    if (log2(input_param->num_sets) + log2(input_param->num_bytes) >= 32) {
+        throw std::invalid_argument("Error: cannot interpret 32-bit memory addresses.");
+    }
+}
+
+void check_valid_string(Input_param* input_param) {
+    if ((input_param->allocate != "write-allocate") && (input_param->allocate != "no-write-allocate")) {
+        throw std::invalid_argument("Error: invalid allocation method");
+    }
+    if ((input_param->write_command != "write-through") && (input_param->write_command != "write-back")) {
+        throw std::invalid_argument("Error: invalid writing method.");
+    }
+    if ((input_param->evictions != "lru") && (input_param->evictions != "fifo")) {
+        throw std::invalid_argument("Error: invalid evictions.");
+    }
+    if ((input_param->write_command == "write-back") && (input_param->allocate == "no-write-allocate")) {
+        throw std::invalid_argument("Error: write-back and no-write-allocate cannot be together");
+    }
 }
 
 //Gigi
@@ -59,9 +91,10 @@ uint32_t log2(uint32_t number) {
     return temp;
 }
 
-//Gigi
+//Gigi// change ?
 uint32_t findTag(uint32_t address, uint32_t index_pos) {
-    return ((1<<(32 - index_pos)) - 1) & (address >> index_pos);
+    //return ((1<<(32 - index_pos)) - 1) & (address >> index_pos);
+    return address >> index_pos;
 }
 
 //Cecelia
@@ -87,10 +120,10 @@ void load_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
     // check hit
     Input_param input = *input_param;
     stats->total_loads++;
-    Set set = cache->sets.at(index);
-    std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.find(tag);
+    Set *set = &(cache->sets.at(index));
+    std::map<uint32_t, Slot *>::iterator it = set->tagToSlot.find(tag);
     // std::map<uint32_t, Slot *>::iterator it = findSlot(tag, index, cache);
-    if (it != set.tagToSlot.end()) {
+    if (it != set->tagToSlot.end()) {
         stats->load_hits++;
         stats->total_cycles++;
         if (input.evictions == "lru") {
@@ -109,9 +142,9 @@ void save_cache(Cache* cache, uint32_t tag, uint32_t index, Stats* stats, Input_
     // check hit
     Input_param input = *input_param;
     stats->total_stores++;
-    Set set = cache->sets.at(index);
-    std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.find(tag);
-    if (it != set.tagToSlot.end()) {
+    Set* set = &(cache->sets.at(index));
+    std::map<uint32_t, Slot *>::iterator it = set->tagToSlot.find(tag);
+    if (it != set->tagToSlot.end()) {
         stats->store_hits++;
         if (input.evictions == "lru") {
             //updateLRU(tag, index, cache);
@@ -161,10 +194,10 @@ void putNewSlot(uint32_t tag, uint32_t index, Input_param* input_param, Cache *c
     } else {
         if (input.evictions == "lru") {
             // kick out slot with the least access_ts
-            original_slot = eviction_lru(*set);
+            original_slot = eviction_lru(set);
         } else {
             // fifo
-            original_slot = eviction_fifo(*set);
+            original_slot = eviction_fifo(set);
         }
 
         if (original_slot->dirty) {
@@ -189,10 +222,10 @@ Slot* find_invalid(Set* set) {
     return NULL;
 }
 
-Slot* eviction_lru(Set set) {
+Slot* eviction_lru(Set* set) {
     uint32_t min_ts = UINT32_MAX;
     std::map<uint32_t, Slot *>::iterator temp_it;
-    for (std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.begin(); it != set.tagToSlot.end(); ++it) {
+    for (std::map<uint32_t, Slot *>::iterator it = set->tagToSlot.begin(); it != set->tagToSlot.end(); ++it) {
         if (it->second->access_ts < min_ts) {
             min_ts = it->second->access_ts;
             temp_it = it;
@@ -201,10 +234,10 @@ Slot* eviction_lru(Set set) {
     return &(*temp_it->second);
 }
 
-Slot* eviction_fifo(Set set) {
+Slot* eviction_fifo(Set* set) {
     uint32_t min_ts = UINT32_MAX;
     std::map<uint32_t, Slot *>::iterator temp_it;
-    for (std::map<uint32_t, Slot *>::iterator it = set.tagToSlot.begin(); it != set.tagToSlot.end(); ++it) {
+    for (std::map<uint32_t, Slot *>::iterator it = set->tagToSlot.begin(); it != set->tagToSlot.end(); ++it) {
         if (it->second->load_ts < min_ts) {
             min_ts = it->second->load_ts;
             temp_it = it;

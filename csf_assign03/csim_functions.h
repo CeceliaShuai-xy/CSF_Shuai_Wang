@@ -52,7 +52,12 @@ typedef struct {
 
 // check if input_param is valid
 // throw std::invalid_argument() if augments is invalid
-void checkValidAuguments(Input_param input_param);
+void checkValidAuguments(Input_param* input_param);
+
+void check_valid_num(Input_param* input_param);
+
+
+void check_valid_string(Input_param* input_param);
 
 //Gigi
 Cache initialization_cache(Input_param input_param);
@@ -85,9 +90,9 @@ bool has_empty(Set* set);
 
 Slot* find_invalid(Set* set);
 
-Slot* eviction_lru(Set set);
+Slot* eviction_lru(Set* set);
 
-Slot* eviction_fifo(Set set);
+Slot* eviction_fifo(Set* set);
 
 void printStats(Stats stats);
 

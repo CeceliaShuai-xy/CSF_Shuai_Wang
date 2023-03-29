@@ -35,9 +35,9 @@ int main(int argc, char* argv[]) {
     }
 
     try {
-        checkValidAuguments(input_param);
+        checkValidAuguments(&input_param);
     } catch (exception &ex) {
-        // print error message
+        cerr << ex.what() << endl;
         return 1;
     }
     
