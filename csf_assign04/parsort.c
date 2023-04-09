@@ -10,9 +10,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-// helper function to sequential sort element
-int compare_i64 (const void *a, const void *b) {
-  return (*(int64_t*)a - *(int64_t*)b);
+// // // helper function to sequential sort element
+// int compare_i64(const void *a, const void *b) {
+//   return (*(int64_t*)a - *(int64_t*)b);
+// }
+int compare_i64(const void * a, const void * b) {
+  if (*(int64_t*)a > *(int64_t*)b) return 1;
+  if (*(int64_t*)a < *(int64_t*)b) return -1;
+  return 0;
 }
 
 // Merge the elements in the sorted ranges [begin, mid) and [mid, end),
@@ -111,18 +116,21 @@ void merge(int64_t *arr, size_t begin, size_t mid, size_t end, int64_t *temparr)
 // }
 
 void print_arr(int64_t *arr, size_t begin, size_t end) {
-  for (int i = begin; i < (end - begin); i++){
-    printf(arr[i]);
-    printf(' ');
+  for (size_t i = begin; i < end; i++){
+    printf("%d", arr[i]);
+    printf(" ");
   }
-  printf('\n');
+  printf("\n");
 }
 
 void merge_sort(int64_t *arr, size_t begin, size_t end, size_t threshold) {
   // TODO: implement
   if(end-begin <= threshold) {
-    printf("Now it's qsorting.\n");
+    printf("Before qsort.\n");
+    print_arr(arr, begin, end);
     qsort(arr + begin, (end-begin), sizeof(int64_t), compare_i64);
+    printf("After qsort.\n");
+    print_arr(arr, begin, end);
   } else {
     pid_t left_child_pid = fork();
     if (left_child_pid == -1) {
@@ -136,7 +144,7 @@ void merge_sort(int64_t *arr, size_t begin, size_t end, size_t threshold) {
       exit(0);
     } else {
       // now in the parent process
-      merge_sort(arr,(begin+end)/2+1, end, threshold);
+      merge_sort(arr,(begin+end)/2, end, threshold);
 
       // wait for both child process to finish and merge
       int wstatus_left;
@@ -212,6 +220,10 @@ int main(int argc, char **argv) {
 
   // TODO: map the file into memory using mmap
   int64_t *data = mmap(NULL, file_size_in_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  printf("Here's data: ");
+  // int num_elements = file_size_in_bytes/sizeof(int64_t);
+  printf("%d\n", file_size_in_bytes/sizeof(int64_t));
+  print_arr(data, 0, file_size_in_bytes/sizeof(int64_t));
   
   if (data == MAP_FAILED) {
     // handle mmap error and exit
@@ -264,7 +276,9 @@ int main(int argc, char **argv) {
       return 1;
     }
 
-
+    printf("**********After sorting all **********\n");
+  // int num_elements = file_size_in_bytes/sizeof(int64_t);
+    print_arr(data, 0, file_size_in_bytes/sizeof(int64_t));
     // TODO: unmap and close the file
     munmap(data, file_size_in_bytes);
     close(fd);
