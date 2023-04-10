@@ -138,17 +138,28 @@ int main(int argc, char **argv) {
 
   // TODO: map the file into memory using mmap
   int64_t *data = mmap(NULL, file_size_in_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-
+  int64_t close_status = close(fd);
+  
   if (data == MAP_FAILED) {
     // handle mmap error and exit
     fprintf(stderr, "Error: failure to mmap the file data.\n"); 
-    close(fd);
+    return 1;
+  }
+
+  if (close_status != 0) {
+    // handle file close error
+    fprintf(stderr, "Error: failure to close the file.\n"); 
     return 1;
   }
 
   merge_sort(data, 0, file_size_in_bytes/sizeof(int64_t), threshold);
-  munmap(data, file_size_in_bytes);
-  close(fd);
+
+  int64_t unmap = munmap(data, file_size_in_bytes);
+  if (unmap != 0) {
+    // handle file close error
+    fprintf(stderr, "Error: failure to unmap the file.\n"); 
+    return 1;
+  }
 
   // TODO: exit with a 0 exit code if sort was successful
   return 0;
