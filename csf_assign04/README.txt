@@ -55,5 +55,17 @@ amount of time that elapsed between when the program started and exited. This is
 we had smaller threshold, we created more child processes to run the qsort in a smaller array 
 in parallel. Since qsort is O(N^2), having a smaller array will speed up the processes.
 However, as the threshold decreases to, for instance, 131072, we observed an increase in
-real time. This might due to that the merging part (O(N)) become expensive when we have
-more child processes to merge.
+real time. This might due to that the merging part needs to make a copy of the sub-arrays
+from the child processes, which is (O(N)) and consumes a considerable amound of time.
+
+Every time we call mergesort, if the length of the array is above the threshold, 
+we will fork a child process to sort the left half of the array and the parent will then 
+sort the right half of the array in parallel. And this call is recursive and will start 
+merging when the left and right part of the array are sorted. 
+
+The merge sort of each half of the array can be scheduled by the OS kernel in parallel in 
+different CPU cores. Theoretically, we expect the left and right half of the arrays are 
+sorted in parallel, but due to the limitatino of how many processes can be run at the same 
+time, some child processes might need to wait for the others to finish first.
+As a result, the left might need to wait for the right to be sorted to be
+eventually merged together, and vice versa.
