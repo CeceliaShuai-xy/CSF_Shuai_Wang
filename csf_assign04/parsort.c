@@ -1,3 +1,9 @@
+/*
+ * Team Members:
+ * Gigi Wang ywang580
+ * Cecelia Shuai xshuai3
+ * 
+ */
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
