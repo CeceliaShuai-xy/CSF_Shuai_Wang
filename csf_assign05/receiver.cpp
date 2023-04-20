@@ -7,6 +7,9 @@
 #include "connection.h"
 #include "client_util.h"
 
+using std::cout;
+void enter_loop(Connection &connection);
+
 int main(int argc, char **argv) {
   if (argc != 5) {
     std::cerr << "Usage: ./receiver [server_address] [port] [username] [room]\n";
@@ -18,16 +21,43 @@ int main(int argc, char **argv) {
   std::string username = argv[3];
   std::string room_name = argv[4];
 
-  Connection conn;
-
   // TODO: connect to server
+  Connection connection;
+  connection.connect(server_hostname, server_port);
 
-  // TODO: send rlogin and join messages (expect a response from
-  //       the server for each one)
+  // TODO: send rlogin (expect a response from
+  Message receiver_message = {TAG_RLOGIN, username};
+  Message server_response;
+  connection.send(receiver_message);
+  connection.receive(server_response);
+  if (server_response.tag == TAG_ERR) {
+    fprintf(stderr, "%s", server_response.data.c_str());
+    exit(1);
+  }
+  // TODO: and join messages
+  receiver_message = {TAG_JOIN,room_name};
+  connection.send(receiver_message);
+  connection.receive(server_response);
+  if (server_response.tag == TAG_ERR) {
+    fprintf(stderr, "%s", server_response.data.c_str());
+    exit(1);
+  }
 
   // TODO: loop waiting for messages from server
   //       (which should be tagged with TAG_DELIVERY)
-
-
+  enter_loop(connection);
   return 0;
+}
+
+void enter_loop(Connection &connection) {
+  Message receiver_message;
+  while (true) {
+    if (connection.receive(receiver_message)) { // if successfully received
+      if(receiver_message.tag == TAG_DELIVERY) {
+        cout << receiver_message.dissect_message();
+      }
+    } else{
+      fprintf(stderr, "%s\n", "Failure to receive message."); 
+    }
+  }
 }

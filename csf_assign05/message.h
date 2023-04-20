@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+using std::string;
+
 struct Message {
   // An encoded message may have at most this many characters,
   // including the trailing newline ('\n'). Note that this does
@@ -20,6 +22,17 @@ struct Message {
     : tag(tag), data(data) { }
 
   // TODO: you could add helper functions
+  string concat_message() const {
+    return tag + ":" + data + "\n"; 
+  }
+
+  string dissect_message() const {
+    int colon_index = data.find(":");
+    string message = data.substr(colon_index + 1);
+    colon_index = message.find(":");
+    return message.substr(0, colon_index) + ": " + message.substr(colon_index + 1);
+  }
+
 };
 
 // standard message tags (note that you don't need to worry about
