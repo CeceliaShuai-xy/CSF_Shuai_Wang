@@ -1,3 +1,4 @@
+/* Group Members: Cecelia Shuai xshuai3, Gigi Wang ywang580 */ 
 #include <iostream>
 #include <string>
 #include <vector>
@@ -28,16 +29,21 @@ int main(int argc, char **argv) {
   // TODO: send rlogin (expect a response from
   Message receiver_message = {TAG_RLOGIN, username};
   Message server_response;
+  // send the message
   connection.send(receiver_message);
+  // get server response
   connection.receive(server_response);
+  // if server gives error to login message, quit
   if (server_response.tag == TAG_ERR) {
     fprintf(stderr, "%s", server_response.data.c_str());
     exit(1);
   }
   // TODO: and join messages
   receiver_message = {TAG_JOIN,room_name};
+  // send message and get server response
   connection.send(receiver_message);
   connection.receive(server_response);
+  // if server gives error to join message, quit
   if (server_response.tag == TAG_ERR) {
     fprintf(stderr, "%s", server_response.data.c_str());
     exit(1);
@@ -49,6 +55,7 @@ int main(int argc, char **argv) {
   return 0;
 }
 
+// helper function for loop
 void enter_loop(Connection &connection) {
   Message receiver_message;
   while (true) {
