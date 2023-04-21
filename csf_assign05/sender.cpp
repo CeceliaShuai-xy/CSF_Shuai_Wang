@@ -65,7 +65,7 @@ void enter_loop(Connection &connection) {
     } else if (token == "/leave") {
       sender_message = {TAG_LEAVE, ""};
     } else if (token == "/quit") {
-      sender_message = {TAG_QUIT, ""};
+      sender_message = {TAG_QUIT, "bye"};
     } else if (token[0]=='/'){
       fprintf(stderr, "%s\n", "invalid command");
       continue;
@@ -79,8 +79,10 @@ void enter_loop(Connection &connection) {
     }
 
     if (!connection.receive(server_response)){
-      fprintf(stderr, "%s\n", "failure to receive message.");
-      exit(1);
+      fprintf(stderr, "%s\n", "failure to receive message_sender.");
+      if (!connection.is_open()) {
+        exit(1);
+      }
     } else {
       if(server_response.tag == TAG_ERR) {
         fprintf(stderr, "%s", server_response.data.c_str());

@@ -52,12 +52,18 @@ int main(int argc, char **argv) {
 void enter_loop(Connection &connection) {
   Message receiver_message;
   while (true) {
-    if (connection.receive(receiver_message)) { // if successfully received
+    // if successfully received
+    if (connection.receive(receiver_message)) {
       if(receiver_message.tag == TAG_DELIVERY) {
         cout << receiver_message.dissect_message();
       }
     } else{
-      fprintf(stderr, "%s\n", "Failure to receive message."); 
+      // prevent infinte loop when server dies:
+      if (connection.get_last_result() == Connection::EOF_OR_ERROR) {
+        exit(1);
+      } else{
+        fprintf(stderr, "%s\n", "Failure to receive message_receiver.");
+      }
     }
   }
 }
