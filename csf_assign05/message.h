@@ -1,3 +1,4 @@
+/* Group Members: Cecelia Shuai xshuai3, Gigi Wang ywang580 */ 
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
