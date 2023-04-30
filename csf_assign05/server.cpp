@@ -64,19 +64,21 @@ void *worker(void *arg) {
 
   // if message is received properly, send ok and communicate with client
   std::string user_name;
+  User* user = new User("");
   if(message.tag == TAG_SLOGIN) {
-    user_name = message.data;
+    user->username = trim(message.data);
     connection->send(Message(TAG_OK, "You successfully log in"));
-    server->chat_with_sender(connection, info->server,user_name);
+    server->chat_with_sender(connection, info->server,user->username);
   } else if (message.tag == TAG_RLOGIN) {
-    user_name = message.data;
+    user->username  = trim(message.data);
     connection->send(Message(TAG_OK, "You successfully log in"));
-    server->chat_with_receiver(connection, info->server,user_name);
+    server->chat_with_receiver(connection, info->server,user);
   } else {
     connection->send(Message(TAG_ERR, "You need to log in first"));
   }
 
   delete info;
+  delete user;
   return nullptr;
 }
 }
@@ -90,7 +92,7 @@ void Server::chat_with_sender(Connection* connection, Server* server, std::strin
     } else {
       if (msg.tag == TAG_JOIN) {
         // if join
-        room = server->find_or_create_room(rtrim(msg.data));
+        room = server->find_or_create_room(trim(msg.data));
         connection->send(Message(TAG_OK, "You successfully join the room"));
 
       } else if (msg.tag == TAG_LEAVE) {
@@ -106,7 +108,7 @@ void Server::chat_with_sender(Connection* connection, Server* server, std::strin
         if (room == nullptr) {
           connection->send(Message(TAG_ERR,"Not in a room yet"));
         } else {
-          room->broadcast_message(username, rtrim(msg.data));
+          room->broadcast_message(username, trim(msg.data));
           connection->send(Message(TAG_OK, "You successfully send the message to the entire room"));
         }
 
@@ -123,7 +125,37 @@ void Server::chat_with_sender(Connection* connection, Server* server, std::strin
 
 }
 
-void Server::chat_with_receiver(Connection* connection, Server* server, std::string username) {
+void Server::chat_with_receiver(Connection* connection, Server* server, User* user) {
+  Message join_message;
+  if (!connection->receive(join_message)) {
+    connection->send(Message(TAG_ERR,"Unable to receive the join message"));
+    return;
+  }
+  if (join_message.tag != TAG_JOIN) {
+    connection->send(Message(TAG_ERR,"Have to join after logging in"));
+    return;
+  }
+  Room* room = server->find_or_create_room(trim(join_message.data));
+  room->add_member(user);
+  connection->send(Message(TAG_OK, "You successfully join the room"));
+
+  if (connection->get_last_result() == Connection::EOF_OR_ERROR) {
+    room->remove_member(user);
+    return;
+  }
+
+  while (true) {
+    Message* message = user->mqueue.dequeue();
+    if(message != nullptr) {
+      connection->send(*message);
+      delete message;
+    }
+
+    if (connection->get_last_result() == Connection::EOF_OR_ERROR) {
+      break;
+    }
+  }
+  room->remove_member(user);
 
 }
 

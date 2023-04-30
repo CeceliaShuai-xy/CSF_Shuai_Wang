@@ -5,6 +5,8 @@
 #include <string>
 #include <pthread.h>
 #include "connection.h"
+#include "client_util.h"
+
 class Room;
 
 class Server {
@@ -20,7 +22,7 @@ public:
 
   // helper functions
   void chat_with_sender(Connection* connection, Server* server, std::string username);
-  void chat_with_receiver(Connection* connection, Server* server, std::string username);
+  void chat_with_receiver(Connection* connection, Server* server, User* user);
 
 private:
   // prohibit value semantics
