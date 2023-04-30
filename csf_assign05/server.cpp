@@ -92,9 +92,12 @@ void Server::chat_with_sender(Connection* connection, Server* server, std::strin
     } else {
       if (msg.tag == TAG_JOIN) {
         // if join
+        if (!checkMessageValidLength(msg)) { // check if message is over MAX_LEN
+          connection->send(Message(TAG_ERR, "invalid message"));
+          return;
+        }
         room = server->find_or_create_room(trim(msg.data));
         connection->send(Message(TAG_OK, "You successfully join the room"));
-
       } else if (msg.tag == TAG_LEAVE) {
         // If leave the room
         if (room == nullptr) {
@@ -108,6 +111,10 @@ void Server::chat_with_sender(Connection* connection, Server* server, std::strin
         if (room == nullptr) {
           connection->send(Message(TAG_ERR,"Not in a room yet"));
         } else {
+          if (!checkMessageValidLength(msg)) { // check if message is over MAX_LEN
+            connection->send(Message(TAG_ERR, "invalid message"));
+            return;
+          }
           room->broadcast_message(username, trim(msg.data));
           connection->send(Message(TAG_OK, "You successfully send the message to the entire room"));
         }
@@ -125,6 +132,13 @@ void Server::chat_with_sender(Connection* connection, Server* server, std::strin
 
 }
 
+bool Server::checkMessageValidLength(Message &msg) {
+  if (msg.data.find("\n") == std::string::npos) {
+    return false;
+  }
+  return true;
+}
+
 void Server::chat_with_receiver(Connection* connection, Server* server, User* user) {
   Message join_message;
   if (!connection->receive(join_message)) {
@@ -132,6 +146,10 @@ void Server::chat_with_receiver(Connection* connection, Server* server, User* us
     return;
   }
   if (join_message.tag != TAG_JOIN) {
+    if (!checkMessageValidLength(join_message)) { // check if message is over MAX_LEN
+      connection->send(Message(TAG_ERR, "invalid join message"));
+      return;
+    }
     connection->send(Message(TAG_ERR,"Have to join after logging in"));
     return;
   }
