@@ -12,7 +12,7 @@
 #include "room.h"
 #include "guard.h"
 #include "server.h"
-
+#include "client_util.h"
 #include "csapp.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -42,21 +42,41 @@ struct ConnInfo{
 
 namespace {
 
+
+
+
 void *worker(void *arg) {
   pthread_detach(pthread_self());
 
   // TODO: use a static cast to convert arg from a void* to
   //       whatever pointer type describes the object(s) needed
   //       to communicate with a client (sender or receiver)
+  ConnInfo* info = static_cast<ConnInfo *>(arg);
+  Server* server = info->server;
+  Message message;
+  Connection* connection = info->connection;
+  
+  if(!connection->receive(message)) {
+    // if not received message, send error message
+    connection->send(Message(TAG_ERR,"Cannot receive the message"));
+    delete info; // free the connect info
+  }
 
-  // TODO: read login message (should be tagged either with
-  //       TAG_SLOGIN or TAG_RLOGIN), send response
+  // if message is received properly, send ok and communicate with client
+  std::string user_name;
+  if(message.tag == TAG_SLOGIN) {
+    user_name = message.data;
+    connection->send(Message(TAG_OK, "You successfully log in"));
+    server->chat_with_sender(connection, info->server,user_name);
+  } else if (message.tag == TAG_RLOGIN) {
+    user_name = message.data;
+    connection->send(Message(TAG_OK, "You successfully log in"));
+    server->chat_with_receiver(connection, info->server,user_name);
+  } else {
+    connection->send(Message(TAG_ERR, "You need to log in first"));
+  }
 
-  // TODO: depending on whether the client logged in as a sender or
-  //       receiver, communicate with the client (implementing
-  //       separate helper functions for each of these possibilities
-  //       is a good idea)
-
+  delete info;
   return nullptr;
 }
 }
@@ -66,8 +86,39 @@ void Server::chat_with_sender(Connection* connection, Server* server, std::strin
   Room* room = nullptr;
   while (1) {
     if(!connection->receive(msg)){
-      connnection->send(Message(TAG_ERR,"invalid message"));
+      connection->send(Message(TAG_ERR,"invalid message"));
+    } else {
+      if (msg.tag == TAG_JOIN) {
+        // if join
+        room = server->find_or_create_room(rtrim(msg.data));
+        connection->send(Message(TAG_OK, "You successfully join the room"));
+
+      } else if (msg.tag == TAG_LEAVE) {
+        // If leave the room
+        if (room == nullptr) {
+          connection->send(Message(TAG_ERR,"Not in a room yet"));
+        } else {
+          // leave the room -> room is invalie
+          room = nullptr;
+          connection->send(Message(TAG_OK, "You successfully leave the room"));
+        }
+      } else if (msg.tag == TAG_SENDALL) {
+        if (room == nullptr) {
+          connection->send(Message(TAG_ERR,"Not in a room yet"));
+        } else {
+          room->broadcast_message(username, rtrim(msg.data));
+          connection->send(Message(TAG_OK, "You successfully send the message to the entire room"));
+        }
+
+      } else if (msg.tag == TAG_QUIT) {
+        connection->send(Message(TAG_OK, "You successfully quit the program"));
+        return;
+      } else {
+        // invalid tag
+        connection->send(Message(TAG_ERR,"invalid message"));
+      }
     }
+    
   }
 
 }

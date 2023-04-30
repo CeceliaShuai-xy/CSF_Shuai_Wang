@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <pthread.h>
+#include "connection.h"
 class Room;
 
 class Server {
@@ -16,6 +17,10 @@ public:
   void handle_client_requests();
 
   Room *find_or_create_room(const std::string &room_name);
+
+  // helper functions
+  void chat_with_sender(Connection* connection, Server* server, std::string username);
+  void chat_with_receiver(Connection* connection, Server* server, std::string username);
 
 private:
   // prohibit value semantics
