@@ -38,12 +38,12 @@ Message *MessageQueue::dequeue() {
 
   // compute a time one second in the future
   ts.tv_sec += 1;
-  Message *msg = nullptr;
+  Message *msg;
 
   // TODO: call sem_timedwait to wait up to 1 second for a message
   //       to be available, return nullptr if no message is available
   if (sem_timedwait(&m_avail,&ts)!= 0) {
-    return msg;
+    return nullptr;
   } 
   // TODO: remove the next message from the queue, return it
   {

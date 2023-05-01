@@ -63,8 +63,11 @@ bool Connection::send(const Message &msg) {
   // TODO: send a message
   // return true if successful, false if not
   // make sure that m_last_result is set appropriately
-  assert(m_last_result == SUCCESS);
-  assert(is_open());
+  // assert(m_last_result == SUCCESS);
+  // assert(is_open());
+  if (m_last_result == EOF_OR_ERROR) {
+    return false;
+  }
   string message = msg.concat_message();
   ssize_t s = rio_writen(m_fd, message.c_str(), message.length());
   if (s != (ssize_t)message.length()) {
@@ -80,10 +83,13 @@ bool Connection::receive(Message &msg) {
   // TODO: receive a message, storing its tag and data in msg
   // return true if successful, false if not
   // make sure that m_last_result is set appropriately
-  assert(m_last_result == SUCCESS);
-  assert(is_open());
+  // assert(m_last_result == SUCCESS);
+  // assert(is_open());
 
    //create buffer with maximum length and null terminator
+  if (m_last_result == EOF_OR_ERROR) {
+    return false;
+  }
   char buf[Message::MAX_LEN + 1];
   ssize_t s = rio_readlineb(&m_fdbuf, buf, Message::MAX_LEN);
   if (s < 1) {

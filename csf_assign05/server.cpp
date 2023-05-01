@@ -66,18 +66,32 @@ void *worker(void *arg) {
   std::string user_name;
   User* user = new User("");
   if(message.tag == TAG_SLOGIN) {
-    user->username = trim(message.data);
+    user_name = trim(message.data);
+    if (!server->checkUsernameValid(user_name)){
+      connection->send(Message(TAG_ERR, "Invalid username"));
+      //delete info;
+      delete user;
+      return nullptr;
+    }
+    user->username = user_name;
     connection->send(Message(TAG_OK, "You successfully log in"));
     server->chat_with_sender(connection, info->server,user->username);
   } else if (message.tag == TAG_RLOGIN) {
-    user->username  = trim(message.data);
+    user_name = trim(message.data);
+    if (!server->checkUsernameValid(user_name)){
+      connection->send(Message(TAG_ERR, "Invalid username"));
+      //delete info;
+      delete user;
+      return nullptr;
+    }
+    user->username  = user_name;
     connection->send(Message(TAG_OK, "You successfully log in"));
     server->chat_with_receiver(connection, info->server,user);
   } else {
     connection->send(Message(TAG_ERR, "You need to log in first"));
   }
 
-  delete info;
+  //delete info;
   delete user;
   return nullptr;
 }
@@ -139,6 +153,18 @@ bool Server::checkMessageValidLength(Message &msg) {
   return true;
 }
 
+bool Server::checkUsernameValid(const std::string& username) {
+  if (username.length() == 0) {
+    return false;
+  }
+  for (char c : username) {
+    if (!std::isalnum(c)) { 
+        return false;
+    }
+  }
+  return true;
+}
+
 void Server::chat_with_receiver(Connection* connection, Server* server, User* user) {
   Message join_message;
   if (!connection->receive(join_message)) {
@@ -191,6 +217,11 @@ Server::Server(int port)
 Server::~Server() {
   // TODO: destroy mutex
   pthread_mutex_destroy(&m_lock);
+  //free room:
+  for(std::map<std::string, Room *>::iterator it=m_rooms.begin(); it!=m_rooms.end(); ++it)
+  {
+      delete it->second;
+  }
 }
 
 bool Server::listen() {
@@ -220,6 +251,8 @@ void Server::handle_client_requests() {
     pthread_t thr_id;
     if (pthread_create(&thr_id, NULL, worker, info) != 0) {
       fprintf(stderr, "%s\n","Connot create thread");
+      connection->send(Message(TAG_ERR,"can't create thread"));
+      delete info;
       exit(1);
     }
   }
