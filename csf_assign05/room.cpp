@@ -14,6 +14,10 @@ Room::Room(const std::string &room_name)
 Room::~Room() {
   pthread_mutex_destroy(&lock);
   // TODO: destroy the mutex
+  //free users
+  for(std::set<User *>::iterator it = members.begin(); it!=members.end(); ++it){
+    delete *it;
+  }
 }
 
 void Room::add_member(User *user) {

@@ -2,6 +2,7 @@
 #include <ctime>
 #include "message_queue.h"
 #include "guard.h"
+#include "message.h"
 
 MessageQueue::MessageQueue() {
   // TODO: initialize the mutex and the semaphore
@@ -13,6 +14,13 @@ MessageQueue::~MessageQueue() {
   // TODO: destroy the mutex and the semaphore
   pthread_mutex_destroy(&m_lock);
   sem_destroy(&m_avail);
+  // free message
+  Message * msg;
+  while (m_messages.size() != 0){
+    msg = m_messages.back();
+    m_messages.pop_back();
+    delete msg;
+  }
 }
 
 void MessageQueue::enqueue(Message *msg) {
