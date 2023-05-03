@@ -1,3 +1,4 @@
+/* Group Members: Cecelia Shuai xshuai3, Gigi Wang ywang580 */ 
 #ifndef ROOM_H
 #define ROOM_H
 

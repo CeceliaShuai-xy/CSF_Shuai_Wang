@@ -1,3 +1,4 @@
+/* Group Members: Cecelia Shuai xshuai3, Gigi Wang ywang580 */ 
 #include "guard.h"
 #include "message.h"
 #include "message_queue.h"
@@ -8,32 +9,35 @@
 Room::Room(const std::string &room_name)
   : room_name(room_name) {
     pthread_mutex_init(&lock, NULL);
-  // TODO: initialize the mutex
+  // initialize the mutex
 }
 
 Room::~Room() {
   pthread_mutex_destroy(&lock);
-  // TODO: destroy the mutex
-  //free users
+  // destroy the mutex
+  //free users in the room
   for(std::set<User *>::iterator it = members.begin(); it!=members.end(); ++it){
     delete *it;
   }
 }
 
 void Room::add_member(User *user) {
-  // TODO: add User to the room
+  // add User to the room
+  // use a guard while changing the members
   Guard g(lock);
   members.insert(user);
 }
 
 void Room::remove_member(User *user) {
-  // TODO: remove User from the room
+  // remove User from the room
+  // use a guard while changing the members
   Guard g(lock);
   members.erase(user);
 }
 
 void Room::broadcast_message(const std::string &sender_username, const std::string &message_text) {
-  // TODO: send a message to every (receiver) User in the room
+  // send a message to every (receiver) User in the room
+  // use guard to protect the message queue
   Guard g(lock);
   std::string message_to_send = room_name + ":" + sender_username + ":" + message_text;
   for (UserSet::iterator it = members.begin(); it!=members.end(); ++it) {
